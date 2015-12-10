@@ -1,0 +1,3 @@
+[submodule "spriterplusplus"]
+	path = spriterplusplus
+	url = https://github.com/labsin/SpriterPlusPlus.git
