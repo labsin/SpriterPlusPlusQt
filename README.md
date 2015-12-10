@@ -2,13 +2,11 @@
 
 A WIP to implement Spriter files in Qt5 Scene Graph to be used in QML
 
-Still needs a lots of improvements.
-
 ## Requirements
 
-You need a Qt5 dev environment and a c+11 compiler.
+You need a Qt5 dev environment, a c+11 compiler and a recent CMake.
 
-## To build
+## HowTo Build
 
 ```
 mkdir build && cd build
@@ -16,9 +14,28 @@ cmake ../
 make
 ```
 
-## To run
+## HowTo Run
+
+Run the example C++ app with the library linked:
 
 ```
 cd bin
 ./SpriterQtExample
 ```
+
+Or run the qml app using qml executable and Spriter qml plugin:
+
+```
+cd bin
+qml main.qml
+```
+
+## HowTo Use
+
+Use the qml plugin:
+
+* Copy bin/Spriter to your qml app.
+
+Link the lib:
+
+* See example/ folder.
