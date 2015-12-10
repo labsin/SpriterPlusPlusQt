@@ -63,6 +63,7 @@ void QEntityInstance::updateQQuickWindow(QQuickWindow *window)
 	if(window) {
 		connect(window,SIGNAL(afterAnimating()),this,SLOT(updateInterface()));
 		connect(window,SIGNAL(frameSwapped()),this,SLOT(updateIfLoaded()));
+		updateIfLoaded();
 	}
 }
 
@@ -70,6 +71,7 @@ void QEntityInstance::updateIfLoaded()
 {
 	if(!m_loaded)
 		return;
+	m_entity->setTimeElapsed(m_time.restart());
 	update();
 }
 
@@ -141,7 +143,6 @@ void QEntityInstance::updateInterface()
 	if(!m_loaded)
 		return;
 
-	m_entity->setTimeElapsed(m_time.restart());
 	ObjectInterfaceVector* zOrder = m_entity->getZOrder();
 
 	if(zOrder == m_previousZOrder) {
@@ -175,20 +176,19 @@ QSGNode *QEntityInstance::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePa
 		node = new QSGNode();
 		m_zOrderChanged = false;
 		for(SpriterEngine::UniversalObjectInterface* interface : m_interfaces) {
-			const QImage & image = dynamic_cast<SpriterEngine::QtImageFile*>(interface->getImage())->image();
+			SpriterEngine::QtImageFile* imageFile = dynamic_cast<SpriterEngine::QtImageFile*>(interface->getImage());
 			QSGSimpleTextureNode* childNode = new QSGSimpleTextureNode();
 			childNode->setFlag(QSGNode::OwnedByParent);
-			QSGTexture *texture = window()->createTextureFromImage(image, QQuickWindow::TextureCanUseAtlas);
-			childNode->setRect(image.rect());
-			childNode->setOwnsTexture(true);
+			QSGTexture *texture = imageFile->getTexture(window());
+			childNode->setRect(imageFile->rect());
 			childNode->setTexture(texture);
 			QMatrix4x4 matrix;
 			matrix.translate(interface->getPosition().x,
 							 interface->getPosition().y);
 			matrix.scale(interface->getScale().x,interface->getScale().y);
 			matrix.rotate(SpriterEngine::toDegrees(interface->getAngle()),QVector3D(0,0,1));
-			matrix.translate(-interface->getPivot().x*image.width(),
-							 -interface->getPivot().y*image.height());
+			matrix.translate(-interface->getPivot().x*imageFile->width(),
+							 -interface->getPivot().y*imageFile->height());
 			QSGTransformNode* transNote = new QSGTransformNode();
 			transNote->setFlag(QSGNode::OwnedByParent);
 			transNote->setMatrix(matrix);
@@ -200,14 +200,14 @@ QSGNode *QEntityInstance::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePa
 		int index=0;
 		for(SpriterEngine::UniversalObjectInterface* interface : m_interfaces) {
 			QSGTransformNode* transNote = dynamic_cast<QSGTransformNode*>(node->childAtIndex(index));
-			const QImage & image = dynamic_cast<SpriterEngine::QtImageFile*>(interface->getImage())->image();
+			SpriterEngine::QtImageFile* imageFile = dynamic_cast<SpriterEngine::QtImageFile*>(interface->getImage());
 			QMatrix4x4 matrix;
 			matrix.translate(interface->getPosition().x,
 							 interface->getPosition().y);
 			matrix.scale(interface->getScale().x,interface->getScale().y);
 			matrix.rotate(SpriterEngine::toDegrees(interface->getAngle()),QVector3D(0,0,1));
-			matrix.translate(-interface->getPivot().x*image.width(),
-							 -interface->getPivot().y*image.height());
+			matrix.translate(-interface->getPivot().x*imageFile->width(),
+							 -interface->getPivot().y*imageFile->height());
 			transNote->setMatrix(matrix);
 			index++;
 		}
