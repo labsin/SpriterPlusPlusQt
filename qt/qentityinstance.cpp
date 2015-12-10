@@ -61,7 +61,6 @@ void QEntityInstance::setModel(QSprinterModel *model)
 void QEntityInstance::updateQQuickWindow(QQuickWindow *window)
 {
 	if(window) {
-		connect(window,SIGNAL(afterAnimating()),this,SLOT(updateInterface()));
 		connect(window,SIGNAL(frameSwapped()),this,SLOT(updateIfLoaded()));
 		updateIfLoaded();
 	}
@@ -71,7 +70,7 @@ void QEntityInstance::updateIfLoaded()
 {
 	if(!m_loaded)
 		return;
-	m_entity->setTimeElapsed(m_time.restart());
+	updateInterface();
 	update();
 }
 
@@ -139,6 +138,7 @@ void QEntityInstance::unload()
 void QEntityInstance::updateInterface()
 {
 	using namespace SpriterEngine;
+	m_entity->setTimeElapsed(m_time.restart());
 
 	if(!m_loaded)
 		return;
