@@ -1,5 +1,9 @@
 project(QT_SPRITER)
 
+set(SPRITER_PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Spriter")
+
+add_subdirectory(data)
+
 include_directories(${SPRITER_ENGINE_SOURCE_DIR})
 include_directories(${SPRITER_PLUS_PLUS_SOURCE_DIR})
 include_directories(${QT_XML_DOC_SOURCE_DIR})
@@ -28,6 +32,13 @@ set(QT_HDRS
     qtpointinstanceinfo.h
     qentityinstance.h)
 
+set(QT_PLUGIN_SRCS
+    spriterplugin.cpp)
+
 add_library(spriterplusplusqt STATIC ${QT_MOC_SRCS} ${QT_SRCS})
+add_library(qmlspriterplugin SHARED ${QT_PLUGIN_SRCS})
 
 target_link_libraries(spriterplusplusqt Qt5::Quick Qt5::Widgets Qt5::Multimedia spriterengine spriterplusplusqtdoc)
+target_link_libraries(qmlspriterplugin spriterplusplusqt)
+set_target_properties(qmlspriterplugin PROPERTIES
+         LIBRARY_OUTPUT_DIRECTORY ${SPRITER_PLUGIN_DIR})

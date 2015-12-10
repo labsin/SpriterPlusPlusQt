@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QtSpriter 1.0
+import Spriter 0.1
 
 Rectangle {
     width: 800
