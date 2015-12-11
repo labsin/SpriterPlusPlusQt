@@ -18,7 +18,8 @@ set(QT_SRCS
     qtboneinstanceinfo.cpp
     qtboxinstanceinfo.cpp
     qtpointinstanceinfo.cpp
-    qentityinstance.cpp)
+    qentityinstance.cpp
+    qsgspriternode.cpp)
 
 set(QT_HDRS
     qsprintermodel.h
@@ -30,15 +31,19 @@ set(QT_HDRS
     qtboneinstanceinfo.h
     qtboxinstanceinfo.h
     qtpointinstanceinfo.h
-    qentityinstance.h)
+    qentityinstance.h
+    qsgspriternode.h)
 
 set(QT_PLUGIN_SRCS
     spriterplugin.cpp)
 
 add_library(spriterplusplusqt STATIC ${QT_MOC_SRCS} ${QT_SRCS})
-add_library(qmlspriterplugin SHARED ${QT_PLUGIN_SRCS})
 
 target_link_libraries(spriterplusplusqt Qt5::Quick Qt5::Widgets Qt5::Multimedia spriterengine spriterplusplusqtdoc)
-target_link_libraries(qmlspriterplugin spriterplusplusqt)
-set_target_properties(qmlspriterplugin PROPERTIES
-         LIBRARY_OUTPUT_DIRECTORY ${SPRITER_PLUGIN_DIR})
+
+if(COMPILE_QML_PLUGIN)
+    add_library(qmlspriterplugin SHARED ${QT_PLUGIN_SRCS})
+    target_link_libraries(qmlspriterplugin spriterplusplusqt)
+    set_target_properties(qmlspriterplugin PROPERTIES
+             LIBRARY_OUTPUT_DIRECTORY ${SPRITER_PLUGIN_DIR})
+endif(COMPILE_QML_PLUGIN)

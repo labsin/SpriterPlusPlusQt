@@ -1,16 +1,21 @@
 #ifndef QENTITYINSTANCE_H
 #define QENTITYINSTANCE_H
 
+#include "qsprintermodel.h"
+
 #include <QQuickItem>
 #include <QTime>
 #include <QPointF>
-#include <QTime>
-#include "qsprintermodel.h"
+#include <QList>
+#include <QHash>
+#include <QMutex>
 
 namespace SpriterEngine {
 class UniversalObjectInterface;
 typedef std::vector<UniversalObjectInterface*> ObjectInterfaceVector;
 }
+
+class QSGSpriterNode;
 
 class QEntityInstance : public QQuickItem
 {
@@ -80,6 +85,8 @@ private:
 	void load();
 	void unload();
 
+	QSGSpriterNode *getQSGSpriterNode(SpriterEngine::UniversalObjectInterface* interface);
+
 	QString m_name;
 	bool m_zOrderChanged;
 	bool m_loaded;
@@ -88,7 +95,8 @@ private:
 	SpriterEngine::EntityInstance* m_entity;
 
 	SpriterEngine::ObjectInterfaceVector* m_previousZOrder;
-	SpriterEngine::ObjectInterfaceVector m_interfaces;
+	QList<SpriterEngine::UniversalObjectInterface*> m_interfaces;
+	QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterNode*> m_nodeMap;
 
 
 	// QQuickItem interface
@@ -99,6 +107,8 @@ private:
 	float m_speedRatio;
 
 	QTime m_time;
+
+	QMutex m_nodeMapMutex;
 
 protected:
 	QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *) override;

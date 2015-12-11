@@ -1,5 +1,6 @@
 #include "qentityinstance.h"
 #include "qtimagefile.h"
+#include "qsgspriternode.h"
 
 #include <entity/entityinstance.h>
 #include <objectinfo/universalobjectinterface.h>
@@ -10,6 +11,8 @@
 #include <QSGNode>
 #include <QSGSimpleTextureNode>
 #include <QSGTransformNode>
+#include <QSGOpacityNode>
+#include <QMutexLocker>
 
 #include <utility>
 #include <math.h>
@@ -32,6 +35,10 @@ QEntityInstance::QEntityInstance(QQuickItem *parent):
 QEntityInstance::~QEntityInstance()
 {
 	delete m_entity;
+	QMutexLocker locker(&m_nodeMapMutex);
+	for(QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterNode*>::iterator it = m_nodeMap.begin(), end = m_nodeMap.end(); it != end; it++) {
+		delete it.value();
+	}
 }
 
 void QEntityInstance::setName(QString name)
@@ -135,6 +142,16 @@ void QEntityInstance::unload()
 	m_loaded = false;
 }
 
+QSGSpriterNode *QEntityInstance::getQSGSpriterNode(SpriterEngine::UniversalObjectInterface *interface)
+{
+	QSGSpriterNode* node = m_nodeMap.value(interface);
+	if(!node){
+		node = new QSGSpriterNode(interface, window());
+		m_nodeMap.insert(interface,node);
+	}
+	return node;
+}
+
 void QEntityInstance::updateInterface()
 {
 	using namespace SpriterEngine;
@@ -166,50 +183,44 @@ void QEntityInstance::updateInterface()
 
 QSGNode *QEntityInstance::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *)
 {
+	QMutexLocker locker(&m_nodeMapMutex);
 	QSGNode * node = oldNode;
 	if(m_interfaces.empty()) {
 		delete oldNode;
 		return 0;
 	}
-	if(!node || m_zOrderChanged) {
-		delete node;
+
+	if(!node) {
 		node = new QSGNode();
+		node->setFlag(QSGNode::OwnedByParent);
 		m_zOrderChanged = false;
 		for(SpriterEngine::UniversalObjectInterface* interface : m_interfaces) {
-			SpriterEngine::QtImageFile* imageFile = dynamic_cast<SpriterEngine::QtImageFile*>(interface->getImage());
-			QSGSimpleTextureNode* childNode = new QSGSimpleTextureNode();
-			childNode->setFlag(QSGNode::OwnedByParent);
-			QSGTexture *texture = imageFile->getTexture(window());
-			childNode->setRect(imageFile->rect());
-			childNode->setTexture(texture);
-			QMatrix4x4 matrix;
-			matrix.translate(interface->getPosition().x,
-							 interface->getPosition().y);
-			matrix.scale(interface->getScale().x,interface->getScale().y);
-			matrix.rotate(SpriterEngine::toDegrees(interface->getAngle()),QVector3D(0,0,1));
-			matrix.translate(-interface->getPivot().x*imageFile->width(),
-							 -interface->getPivot().y*imageFile->height());
-			QSGTransformNode* transNote = new QSGTransformNode();
-			transNote->setFlag(QSGNode::OwnedByParent);
-			transNote->setMatrix(matrix);
-			transNote->appendChildNode(childNode);
-			node->appendChildNode(transNote);
+			node->appendChildNode(getQSGSpriterNode(interface)->update());
+		}
+	}
+	else if(m_zOrderChanged) {
+		QSGSpriterNode* previousNode = nullptr;
+		for(SpriterEngine::UniversalObjectInterface* interface : m_interfaces) {
+			QSGSpriterNode* currentNode = getQSGSpriterNode(interface);
+			if(currentNode->parent()) {
+				node->removeChildNode(currentNode);
+			}
+			if(previousNode) {
+				node->insertChildNodeAfter(currentNode,previousNode);
+			}
+			else {
+				node->prependChildNode(currentNode);
+			}
+			currentNode->update();
+			previousNode = currentNode;
+		}
+		while(QSGNode* next = previousNode->nextSibling()) {
+			node->removeChildNode(next);
 		}
 	}
 	else {
-		int index=0;
 		for(SpriterEngine::UniversalObjectInterface* interface : m_interfaces) {
-			QSGTransformNode* transNote = dynamic_cast<QSGTransformNode*>(node->childAtIndex(index));
-			SpriterEngine::QtImageFile* imageFile = dynamic_cast<SpriterEngine::QtImageFile*>(interface->getImage());
-			QMatrix4x4 matrix;
-			matrix.translate(interface->getPosition().x,
-							 interface->getPosition().y);
-			matrix.scale(interface->getScale().x,interface->getScale().y);
-			matrix.rotate(SpriterEngine::toDegrees(interface->getAngle()),QVector3D(0,0,1));
-			matrix.translate(-interface->getPivot().x*imageFile->width(),
-							 -interface->getPivot().y*imageFile->height());
-			transNote->setMatrix(matrix);
-			index++;
+			getQSGSpriterNode(interface)->update();
 		}
 	}
 	return node;
