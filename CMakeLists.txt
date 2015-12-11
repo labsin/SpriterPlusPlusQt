@@ -1,5 +1,6 @@
 project(SPRITER_PLUS_PLUS_QT)
 cmake_minimum_required(VERSION 2.9)
+option(COMPILE_QML_PLUGIN "Compile the qml plugin" ON)
 
 if(${PROJECT_BINARY_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
    message(FATAL_ERROR "In-tree build attempt detected, aborting. Set your build dir outside your source dir, delete CMakeCache.txt from source root and try again.")

@@ -1,6 +1,10 @@
 project(SPRITER_QT_EXAMPLE)
 set(EXECUTABLE_NAME SpriterQtExample)
 
+if(COMPILE_QML_PLUGIN)
+    add_definitions(-DCOMPILE_QML_PLUGIN)
+endif(COMPILE_QML_PLUGIN)
+
 add_custom_target(SPRITER_QT_EXAMPLE ALL)
 add_definitions(-DQT_QML_DEBUG)
 

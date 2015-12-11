@@ -1,7 +1,9 @@
-set(DATA
+set(QMLDIR
     qmldir)
 
-qtcreator_add_project_resources(${DATA})
+qtcreator_add_project_resources(${QMLDIR})
 
-file(COPY ${DATA}
-    DESTINATION ${SPRITER_PLUGIN_DIR})
+if(COMPILE_QML_PLUGIN)
+    file(COPY ${QMLDIR}
+        DESTINATION ${SPRITER_PLUGIN_DIR})
+endif(COMPILE_QML_PLUGIN)
