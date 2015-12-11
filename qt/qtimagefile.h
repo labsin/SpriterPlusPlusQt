@@ -2,6 +2,7 @@
 #define QTIMAGEFILE_H
 
 #include "override/imagefile.h"
+
 #include <QImage>
 #include <QMutex>
 #include <QHash>
@@ -38,7 +39,7 @@ private:
 
 	QImage m_image;
 	QHash<QQuickWindow*,QSGTexture*> m_textureMap;
-	QMutex m_textureMutex;
+	QMutex m_textureMapMutex;
 	int m_width;
 	int m_height;
 };

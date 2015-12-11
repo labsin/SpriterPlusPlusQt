@@ -18,7 +18,7 @@ QtImageFile::~QtImageFile()
 }
 
 QSGTexture* QtImageFile::getTexture(QQuickWindow* window) {
-	QMutexLocker locker(&m_textureMutex);
+	QMutexLocker locker(&m_textureMapMutex);
 	QSGTexture* texture = m_textureMap.value(window);
 	if(texture)
 		return texture;
@@ -53,7 +53,7 @@ void QtImageFile::initializeFile()
 
 void QtImageFile::clearTextures()
 {
-	QMutexLocker locker(&m_textureMutex);
+	QMutexLocker locker(&m_textureMapMutex);
 	for(QHash<QQuickWindow*,QSGTexture*>::iterator it = m_textureMap.begin(), end = m_textureMap.end(); it != end; it++) {
 		delete it.value();
 	}
