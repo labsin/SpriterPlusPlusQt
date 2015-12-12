@@ -14,6 +14,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 # Compiler options
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fmax-errors=2 -Wall -Wno-unused-function")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(SKIP_EXAMPLES ON)
 
 include("QtCreatorResources")
 
