@@ -8,6 +8,8 @@ Rectangle {
     SpriterModel {
         id: modelId
         file: "GreyGuy/player.scml"
+        debug: true
+        renderBones: true
     }
     Repeater {
         model:100
@@ -18,12 +20,13 @@ Rectangle {
             name: "Player"
             animation: "walk"
             scale: {var a = Math.random();Qt.point(a,a)}
+            speedRatio: Math.random()
         }
     }
     Rectangle {
         anchors.centerIn: parent
-        width: 100
-        height: 150
+        width: 200
+        height: 300
         color: "white"
         EntityInstance {
             anchors.bottom: parent.bottom
@@ -31,8 +34,7 @@ Rectangle {
             anchors.bottomMargin: 20
             model: modelId
             name: "Player"
-            animation: "idle"
-            scale: "0.5,0.5"
+            animation: "walk"
         }
     }
 }

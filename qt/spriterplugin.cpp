@@ -2,8 +2,8 @@
 #define SPRITERPLUGIN_H
 
 #include <QQmlExtensionPlugin>
-#include "qsprintermodel.h"
-#include "qentityinstance.h"
+#include "qtspritermodel.h"
+#include "qtentityinstance.h"
 
 class SpriterPlugin : public QQmlExtensionPlugin
 {
@@ -14,8 +14,8 @@ public:
 	void registerTypes(const char *uri)
 	{
 		Q_ASSERT(uri == QLatin1String("Spriter"));
-		qmlRegisterType<QSprinterModel>(uri, 0, 1, "SpriterModel");
-		qmlRegisterType<QEntityInstance>(uri, 0, 1, "EntityInstance");
+		qmlRegisterType<QtSpriterModel>(uri, 0, 1, "SpriterModel");
+		qmlRegisterType<QtEntityInstance>(uri, 0, 1, "EntityInstance");
 	}
 };
 

@@ -1,17 +1,22 @@
 #include <QQuickView>
 #include <QApplication>
-#include "qsprintermodel.h"
-#include "qentityinstance.h"
-#include <QtQml/qqmldebug.h>
+
+#ifndef COMPILE_QML_PLUGIN
+#include "qtspritermodel.h"
+#include "qtentityinstance.h"
+#endif
 
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 #ifndef COMPILE_QML_PLUGIN
-	qmlRegisterType<QSprinterModel>("Spriter", 0, 1, "SpriterModel");
-	qmlRegisterType<QEntityInstance>("Spriter", 0, 1, "EntityInstance");
+	qmlRegisterType<QtSpriterModel>("Spriter", 0, 1, "SpriterModel");
+	qmlRegisterType<QtEntityInstance>("Spriter", 0, 1, "EntityInstance");
 #endif
-    QQuickView view;
+	QQuickView view;
+//	QSurfaceFormat format = view.format();
+//	format.setSamples(16);
+//	view.setFormat(format);
 	view.setResizeMode(QQuickView::SizeRootObjectToView);
 	view.setSource(QUrl::fromLocalFile("main.qml"));
 	view.show();

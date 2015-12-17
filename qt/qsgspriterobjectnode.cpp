@@ -1,4 +1,5 @@
-#include "qsgspriternode.h"
+#include "qsgspriterobjectnode.h"
+
 #include "objectinfo/universalobjectinterface.h"
 #include "qtimagefile.h"
 #include "global/global.h"
@@ -6,8 +7,8 @@
 #include <QSGSimpleTextureNode>
 #include <QSGTransformNode>
 
-QSGSpriterNode::QSGSpriterNode(SpriterEngine::UniversalObjectInterface *interface, QQuickWindow* window):
-	QSGOpacityNode(), m_interface(interface)
+QSGSpriterObjectNode::QSGSpriterObjectNode(SpriterEngine::UniversalObjectInterface *interface, QQuickWindow *window):
+	QSGSpriterBase(interface), QSGOpacityNode()
 {
 	m_imageFile = dynamic_cast<SpriterEngine::QtImageFile*>(m_interface->getImage());
 	Q_ASSERT(m_imageFile);
@@ -23,47 +24,29 @@ QSGSpriterNode::QSGSpriterNode(SpriterEngine::UniversalObjectInterface *interfac
 	appendChildNode(m_transNode);
 }
 
-QSGSpriterNode::~QSGSpriterNode()
+QSGSpriterObjectNode::~QSGSpriterObjectNode()
 {
 	delete m_textureNode;
 	delete m_transNode;
 }
 
-QSGSimpleTextureNode *QSGSpriterNode::textureNode() const
+QSGNode *QSGSpriterObjectNode::update()
 {
-	return m_textureNode;
-}
-
-QSGTransformNode *QSGSpriterNode::transNode() const
-{
-	return m_transNode;
-}
-
-SpriterEngine::QtImageFile *QSGSpriterNode::imageFile() const
-{
-	return m_imageFile;
-}
-
-QSGSpriterNode *QSGSpriterNode::update(){
 	setOpacity(m_interface->getAlpha());
 
 	QMatrix4x4 matrix;
 	matrix.translate(m_interface->getPosition().x,
 									 m_interface->getPosition().y);
-	matrix.scale(m_interface->getScale().x,m_interface->getScale().y);
 	matrix.rotate(SpriterEngine::toDegrees(m_interface->getAngle()),QVector3D(0,0,1));
+	matrix.scale(m_interface->getScale().x,m_interface->getScale().y);
 	matrix.translate(-m_interface->getPivot().x*m_imageFile->width(),
 									 -m_interface->getPivot().y*m_imageFile->height());
 	m_transNode->setMatrix(matrix);
 	return this;
 }
 
-SpriterEngine::UniversalObjectInterface *QSGSpriterNode::interface() const
-{
-	return m_interface;
-}
 
-void QSGSpriterNode::setInterface(SpriterEngine::UniversalObjectInterface *interface)
+QSGNode *QSGSpriterObjectNode::node()
 {
-	m_interface = interface;
+	return this;
 }

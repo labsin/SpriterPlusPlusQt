@@ -9,7 +9,7 @@ include_directories(${SPRITER_PLUS_PLUS_SOURCE_DIR})
 include_directories(${QT_XML_DOC_SOURCE_DIR})
 
 set(QT_SRCS
-    qsprintermodel.cpp
+    qtspritermodel.cpp
     qtfilefactory.cpp
     qtobjectfactory.cpp
     qtimagefile.cpp
@@ -18,11 +18,13 @@ set(QT_SRCS
     qtboneinstanceinfo.cpp
     qtboxinstanceinfo.cpp
     qtpointinstanceinfo.cpp
-    qentityinstance.cpp
-    qsgspriternode.cpp)
+    qtentityinstance.cpp
+    qsgspriterbase.cpp
+    qsgspriterobjectnode.cpp
+    qsgspriterbonenode.cpp)
 
 set(QT_HDRS
-    qsprintermodel.h
+    qtspritermodel.h
     qtfilefactory.h
     qtobjectfactory.h
     qtimagefile.h
@@ -31,8 +33,10 @@ set(QT_HDRS
     qtboneinstanceinfo.h
     qtboxinstanceinfo.h
     qtpointinstanceinfo.h
-    qentityinstance.h
-    qsgspriternode.h)
+    qtentityinstance.h
+    qsgspriterbase.h
+    qsgspriterobjectnode.h
+    qsgspriterbonenode.h)
 
 set(QT_PLUGIN_SRCS
     spriterplugin.cpp)

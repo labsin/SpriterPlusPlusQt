@@ -1,7 +1,7 @@
 #ifndef QENTITYINSTANCE_H
 #define QENTITYINSTANCE_H
 
-#include "qsprintermodel.h"
+#include "qtspritermodel.h"
 
 #include <QQuickItem>
 #include <QTime>
@@ -15,27 +15,27 @@ class UniversalObjectInterface;
 typedef std::vector<UniversalObjectInterface*> ObjectInterfaceVector;
 }
 
-class QSGSpriterNode;
+class QSGSpriterBase;
 
-class QEntityInstance : public QQuickItem
+class QtEntityInstance : public QQuickItem
 {
 	Q_OBJECT
 	Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-	Q_PROPERTY(QSprinterModel* model READ model WRITE setModel NOTIFY modelChanged)
+	Q_PROPERTY(QtSpriterModel* model READ model WRITE setModel NOTIFY modelChanged)
 	Q_PROPERTY(QString animation READ animation WRITE setAnimation NOTIFY animationChanged)
 	Q_PROPERTY(QPointF scale READ scale WRITE setScale NOTIFY scaleChanged)
 	Q_PROPERTY(float speedRatio READ speedRatio WRITE setSpeedRatio NOTIFY speedRatioChanged)
 
 public:
-	QEntityInstance(QQuickItem *parent = 0);
-	~QEntityInstance();
+	QtEntityInstance(QQuickItem *parent = 0);
+	~QtEntityInstance();
 
 	QString name() const
 	{
 		return m_name;
 	}
 
-	QSprinterModel* model() const
+	QtSpriterModel* model() const
 	{
 		return m_model;
 	}
@@ -58,7 +58,7 @@ public:
 signals:
 	void nameChanged(QString name);
 
-	void modelChanged(QSprinterModel* model);
+	void modelChanged(QtSpriterModel* model);
 
 	void animationChanged(QString animation);
 
@@ -69,7 +69,7 @@ signals:
 public slots:
 	void setName(QString name);
 
-	void setModel(QSprinterModel* model);
+	void setModel(QtSpriterModel* model);
 
 	void updateQQuickWindow(QQuickWindow* window);
 	void updateIfLoaded();
@@ -85,18 +85,18 @@ private:
 	void load();
 	void unload();
 
-	QSGSpriterNode *getQSGSpriterNode(SpriterEngine::UniversalObjectInterface* interface);
+	QSGSpriterBase *getQSGSpriterNode(SpriterEngine::UniversalObjectInterface* interface);
 
 	QString m_name;
 	bool m_zOrderChanged;
 	bool m_loaded;
 
-	QSprinterModel* m_model;
+	QtSpriterModel* m_model;
 	SpriterEngine::EntityInstance* m_entity;
 
 	SpriterEngine::ObjectInterfaceVector* m_previousZOrder;
 	QList<SpriterEngine::UniversalObjectInterface*> m_interfaces;
-	QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterNode*> m_nodeMap;
+	QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterBase*> m_nodeMap;
 
 
 	// QQuickItem interface
