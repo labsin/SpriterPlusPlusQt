@@ -29,12 +29,20 @@ Rectangle {
         height: 300
         color: "white"
         EntityInstance {
+            id: mainChar
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottomMargin: 20
             model: modelId
             name: "Player"
             animation: "walk"
+            onLooped: {
+                this.pause()
+            }
+        }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: mainChar.startResume()
         }
     }
 }

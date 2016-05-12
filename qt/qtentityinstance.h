@@ -66,6 +66,10 @@ signals:
 
 	void speedRatioChanged(float speedRatio);
 
+	void looped();
+
+	void finished();
+
 public slots:
 	void setName(QString name);
 
@@ -81,6 +85,9 @@ public slots:
 	void setSpeedRatio(float speedRatio);
 	void updateInterface();
 
+	void startResume();
+	void pause();
+
 private:
 	void load();
 	void unload();
@@ -89,10 +96,10 @@ private:
 
 	QString m_name;
 	bool m_zOrderChanged;
-	bool m_loaded;
 
 	QtSpriterModel* m_model;
-	SpriterEngine::EntityInstance* m_entity;
+	QHash<QString, SpriterEngine::EntityInstance*> m_entityMap;
+	SpriterEngine::EntityInstance* m_currentEntity;
 
 	SpriterEngine::ObjectInterfaceVector* m_zOrder;
 	QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterBase*> m_nodeMap;

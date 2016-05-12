@@ -24,9 +24,9 @@
 QtEntityInstance::QtEntityInstance(QQuickItem *parent):
 	QQuickItem(parent),
 	m_zOrderChanged(false),
-	m_loaded(false),
+	m_currentEntity(false),
 	m_model(nullptr),
-	m_entity(nullptr),
+	m_currentEntity(nullptr),
 	m_zOrder(nullptr),
 	m_scale(1,1),
 	m_speedRatio(1.0)
@@ -38,7 +38,10 @@ QtEntityInstance::QtEntityInstance(QQuickItem *parent):
 
 QtEntityInstance::~QtEntityInstance()
 {
-	delete m_entity;
+	for(QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterBase*>::iterator it = m_entityMap.begin(), end = m_entityMap.end(); it != end; it++) {
+		delete it.value();
+	}
+
 	QMutexLocker locker(&m_nodeMapMutex);
 	for(QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterBase*>::iterator it = m_nodeMap.begin(), end = m_nodeMap.end(); it != end; it++) {
 		delete it.value();
@@ -49,6 +52,10 @@ void QtEntityInstance::setName(QString name)
 {
 	if (m_name == name)
 		return;
+
+	if(!m_name.isNull()) {
+		unload();
+	}
 
 	m_name = name;
 	if(m_model) {
@@ -79,7 +86,7 @@ void QtEntityInstance::updateQQuickWindow(QQuickWindow *window)
 
 void QtEntityInstance::updateIfLoaded()
 {
-	if(!m_loaded)
+	if(!m_currentEntity)
 		return;
 	updateInterface();
 	update();
@@ -91,8 +98,8 @@ void QtEntityInstance::setAnimation(QString animation)
 		return;
 
 	m_animation = animation;
-	if(m_loaded) {
-		m_entity->setCurrentAnimation(m_animation.toStdString());
+	if(m_currentEntity) {
+		m_currentEntity->setCurrentAnimation(m_animation.toStdString());
 	}
 	emit animationChanged(animation);
 }
@@ -103,8 +110,8 @@ void QtEntityInstance::setScale(QPointF scale)
 		return;
 
 	m_scale = scale;
-	if(m_loaded) {
-		m_entity->setScale(SpriterEngine::point{m_scale.x(),m_scale.y()});
+	if(m_currentEntity) {
+		m_currentEntity->setScale(SpriterEngine::point{m_scale.x(),m_scale.y()});
 	}
 	emit scaleChanged(scale);
 }
@@ -115,8 +122,8 @@ void QtEntityInstance::setSpeedRatio(float speedRatio)
 		return;
 
 	m_speedRatio = speedRatio;
-	if(m_loaded) {
-		m_entity->setPlaybackSpeedRatio(m_speedRatio);
+	if(m_currentEntity) {
+		m_currentEntity->setPlaybackSpeedRatio(m_speedRatio);
 	}
 	emit speedRatioChanged(speedRatio);
 }
@@ -127,23 +134,24 @@ void QtEntityInstance::load()
 	Q_ASSERT(m_model);
 	Q_ASSERT(!m_name.isEmpty());
 
-	m_entity = m_model->getNewEntityInstance(m_name);
-	if(!m_animation.isEmpty()) {
-		m_entity->setCurrentAnimation(m_animation.toStdString());
+	m_currentEntity = m_entityMap.value(m_name);
+	if(!m_currentEntity) {
+		m_currentEntity = m_model->getNewEntityInstance(m_name);
+		m_entityMap.insert(m_name, m_currentEntity);
 	}
-	m_entity->setScale(SpriterEngine::point{m_scale.x(),m_scale.y()});
-	m_entity->setPlaybackSpeedRatio(m_speedRatio);
+	if(!m_animation.isEmpty()) {
+		m_currentEntity->setCurrentAnimation(m_animation.toStdString());
+	}
+	m_currentEntity->setScale(SpriterEngine::point{m_scale.x(),m_scale.y()});
+	m_currentEntity->setPlaybackSpeedRatio(m_speedRatio);
 
-	m_loaded = true;
 	m_time.start();
 }
 
 void QtEntityInstance::unload()
 {
-	delete m_entity;
-	m_entity = nullptr;
-
-	m_loaded = false;
+	m_currentEntity->pausePlayback();
+	m_currentEntity = nullptr;
 }
 
 QSGSpriterBase *QtEntityInstance::getQSGSpriterNode(SpriterEngine::UniversalObjectInterface *interface)
@@ -166,13 +174,13 @@ QSGSpriterBase *QtEntityInstance::getQSGSpriterNode(SpriterEngine::UniversalObje
 
 void QtEntityInstance::updateInterface()
 {
-	using namespace SpriterEngine;
-	m_entity->setTimeElapsed(m_time.restart());
-
-	if(!m_loaded)
+	if(!m_currentEntity)
 		return;
 
-	ObjectInterfaceVector* zOrder = m_entity->getZOrder();
+	using namespace SpriterEngine;
+	m_currentEntity->setTimeElapsed(m_time.restart());
+
+	ObjectInterfaceVector* zOrder = m_currentEntity->getZOrder();
 
 	if(zOrder == m_zOrder) {
 		// SpriterPlusPlus builds a new vector on a zOrder change
@@ -182,6 +190,28 @@ void QtEntityInstance::updateInterface()
 
 	m_zOrderChanged = true;
 	m_zOrder = zOrder;
+	if(m_currentEntity->animationJustFinished()) {
+		emit finished();
+	}
+	if(m_currentEntity->animationJustLooped()) {
+		emit looped();
+	}
+}
+
+void QtEntityInstance::startResume()
+{
+	if(m_animation.isEmpty())
+		return;
+
+	m_currentEntity->startResumePlayback();
+}
+
+void QtEntityInstance::pause()
+{
+	if(m_animation.isEmpty())
+		return;
+
+	m_currentEntity->pausePlayback();
 }
 
 

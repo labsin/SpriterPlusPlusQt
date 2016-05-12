@@ -69,9 +69,6 @@ private:
 	QString m_file;
 
 	bool m_debug;
-	bool m_renderBones;
-	bool m_renderPoints;
-	bool m_renderBoxes;
 };
 
 #endif // QSPRINTERMODEL_H
