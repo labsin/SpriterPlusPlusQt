@@ -94,8 +94,7 @@ private:
 	QtSpriterModel* m_model;
 	SpriterEngine::EntityInstance* m_entity;
 
-	SpriterEngine::ObjectInterfaceVector* m_previousZOrder;
-	QList<SpriterEngine::UniversalObjectInterface*> m_interfaces;
+	SpriterEngine::ObjectInterfaceVector* m_zOrder;
 	QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterBase*> m_nodeMap;
 
 

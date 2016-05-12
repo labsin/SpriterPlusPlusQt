@@ -27,7 +27,7 @@ QtEntityInstance::QtEntityInstance(QQuickItem *parent):
 	m_loaded(false),
 	m_model(nullptr),
 	m_entity(nullptr),
-	m_previousZOrder(nullptr),
+	m_zOrder(nullptr),
 	m_scale(1,1),
 	m_speedRatio(1.0)
 {
@@ -104,7 +104,7 @@ void QtEntityInstance::setScale(QPointF scale)
 
 	m_scale = scale;
 	if(m_loaded) {
-		m_entity->setScale(SpriterEngine::point(m_scale.x(),m_scale.y()));
+		m_entity->setScale(SpriterEngine::point{m_scale.x(),m_scale.y()});
 	}
 	emit scaleChanged(scale);
 }
@@ -131,7 +131,7 @@ void QtEntityInstance::load()
 	if(!m_animation.isEmpty()) {
 		m_entity->setCurrentAnimation(m_animation.toStdString());
 	}
-	m_entity->setScale(SpriterEngine::point(m_scale.x(),m_scale.y()));
+	m_entity->setScale(SpriterEngine::point{m_scale.x(),m_scale.y()});
 	m_entity->setPlaybackSpeedRatio(m_speedRatio);
 
 	m_loaded = true;
@@ -174,12 +174,14 @@ void QtEntityInstance::updateInterface()
 
 	ObjectInterfaceVector* zOrder = m_entity->getZOrder();
 
-	if(zOrder == m_previousZOrder) {
+	if(zOrder == m_zOrder) {
+		// SpriterPlusPlus builds a new vector on a zOrder change
+		// That's why we can do the compare
 		return;
 	}
 
 	m_zOrderChanged = true;
-	m_previousZOrder = zOrder;
+	m_zOrder = zOrder;
 }
 
 
@@ -187,43 +189,73 @@ QSGNode *QtEntityInstance::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdateP
 {
 	QMutexLocker locker(&m_nodeMapMutex);
 	QSGNode * node = oldNode;
-	if(!m_previousZOrder || m_previousZOrder->empty()) {
+	if(!m_zOrder || m_zOrder->empty()) {
 		delete oldNode;
 		return 0;
 	}
 
 	if(!node) {
+		// First run
 		node = new QSGNode();
 		node->setFlag(QSGNode::OwnedByParent);
-		m_zOrderChanged = false;
-		for(SpriterEngine::UniversalObjectInterface* interface : *m_previousZOrder) {
+		for(SpriterEngine::UniversalObjectInterface* interface : *m_zOrder) {
 			node->appendChildNode(getQSGSpriterNode(interface)->update());
 		}
+		m_zOrderChanged = false;
 	}
 	else if(m_zOrderChanged) {
-		QSGSpriterBase* previousBase = nullptr;
-		for(SpriterEngine::UniversalObjectInterface* interface : *m_previousZOrder) {
-			QSGSpriterBase* currentBase = getQSGSpriterNode(interface);
-			if(currentBase->node()) {
-				if(currentBase->node()->parent()) {
-					node->removeChildNode(currentBase->node());
+		// Repopulate the base node
+		if(true) {
+			// Trying to optimize. The node childs are linked list, so pushing them arround should be fast.
+			QSGNode* previousNode = nullptr;
+			for(SpriterEngine::UniversalObjectInterface* interface : *m_zOrder) {
+				QSGSpriterBase* current = getQSGSpriterNode(interface);
+				QSGNode* currentNode = current->node();
+				if(currentNode) {
+					if(previousNode) {
+						if(currentNode->previousSibling() != previousNode){
+							// If it's not in the right place, put it after the previous
+							if(currentNode->parent()) {
+								node->removeChildNode(currentNode);
+							}
+							node->insertChildNodeAfter(currentNode, previousNode);
+						}
+					}
+					else {
+						// The node should be added to the front
+						if(node->firstChild() != currentNode) { // Only if it's not yet the first
+							if(currentNode->parent()) {
+								node->removeChildNode(currentNode);
+							}
+							node->prependChildNode(currentNode);
+						}
+					}
+					current->update();
+					previousNode = currentNode;
 				}
-				if(previousBase) {
-					node->insertChildNodeAfter(currentBase->node(),previousBase->node());
+			}
+			if(previousNode) {
+				// All nodes are inserted so all after the last ones are no longer needed.
+				QSGNode* next = previousNode->nextSibling();
+				QSGNode* current = nullptr;
+				while(next) {
+					current = next;
+					next = next->nextSibling();
+					node->removeChildNode(current);
 				}
-				else {
-					node->prependChildNode(currentBase->node());
-				}
-				currentBase->update();
-				previousBase = currentBase;
 			}
 		}
-		while(QSGNode* next = previousBase->node()->nextSibling()) {
-			node->removeChildNode(next);
+		else {
+			// Unoptimized way could sometimes be faster.
+			node->removeAllChildNodes();
+			for(SpriterEngine::UniversalObjectInterface* interface : *m_zOrder) {
+				node->appendChildNode(getQSGSpriterNode(interface)->update());
+			}
 		}
+		m_zOrderChanged = false;
 	}
 	else {
-		for(SpriterEngine::UniversalObjectInterface* interface : *m_previousZOrder) {
+		for(SpriterEngine::UniversalObjectInterface* interface : *m_zOrder) {
 			getQSGSpriterNode(interface)->update();
 		}
 	}

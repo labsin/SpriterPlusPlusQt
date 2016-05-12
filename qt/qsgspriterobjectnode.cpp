@@ -10,7 +10,7 @@
 QSGSpriterObjectNode::QSGSpriterObjectNode(SpriterEngine::UniversalObjectInterface *interface, QQuickWindow *window):
 	QSGSpriterBase(interface), QSGOpacityNode()
 {
-	m_imageFile = dynamic_cast<SpriterEngine::QtImageFile*>(m_interface->getImage());
+	m_imageFile = static_cast<SpriterEngine::QtImageFile*>(m_interface->getImage());
 	Q_ASSERT(m_imageFile);
 
 	QSGTexture *texture = m_imageFile->getTexture(window);
