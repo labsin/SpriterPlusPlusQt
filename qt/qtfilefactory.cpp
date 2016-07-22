@@ -3,6 +3,7 @@
 #include "qtjsonspriterfiledocumentwrapper.h"
 #include "qtimagefile.h"
 #include "qtsoundfile.h"
+#include "qtatlasfile.h"
 
 using namespace SpriterEngine;
 
@@ -19,6 +20,11 @@ ImageFile *QtFileFactory::newImageFile(const std::string &initialFilePath, point
 SoundFile *QtFileFactory::newSoundFile(const std::string &initialFilePath)
 {
 	return new QtSoundFile(initialFilePath);
+}
+
+AtlasFile *QtFileFactory::newAtlasFile(const std::string &initialFilePath)
+{
+	return new QtAtlasFile(initialFilePath);
 }
 
 SpriterFileDocumentWrapper *QtFileFactory::newScmlDocumentWrapper()

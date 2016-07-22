@@ -1,7 +1,7 @@
-#ifndef QTIMAGEFILE_H
-#define QTIMAGEFILE_H
+#ifndef QTATLASFILE_H
+#define QTATLASFILE_H
 
-#include "override/imagefile.h"
+#include "override/atlasfile.h"
 
 #include <QImage>
 #include <QMutex>
@@ -12,13 +12,12 @@ class QSGTexture;
 class QQuickWindow;
 namespace SpriterEngine
 {
-class QtImageFile : public ImageFile
+class QtAtlasFile : public AtlasFile
 {
 public:
-	QtImageFile(std::string initialFilePath, point initialDefaultPivot, atlasdata atlasData);
-	~QtImageFile();
+	QtAtlasFile(std::string initialFilePath);
+	~QtAtlasFile();
 
-	void renderSprite(UniversalObjectInterface *spriteInfo) override;
 	const QImage & image() {
 		return m_image;
 	}
@@ -29,27 +28,20 @@ public:
 		return m_height;
 	}
 
-	QRect targetRect() const;
-
-	QRect sourceRect() const;
-
-	bool rotated();
+	QRect rect() const;
 
 	QSGTexture* getTexture(QQuickWindow* window);
 
 private:
 	void initializeFile();
 	void clearTextures();
-	void setAtlasFile(AtlasFile *initialAtlasFile, atlasframedata initialAtlasFrameData) override;
 
 	QImage m_image;
 	QHash<QQuickWindow*,QSGTexture*> m_textureMap;
 	QMutex m_textureMapMutex;
 	int m_width;
 	int m_height;
-
-	bool m_rotated;
 };
 }
 
-#endif // QTIMAGEFILE_H
+#endif // QTATLASFILE_H

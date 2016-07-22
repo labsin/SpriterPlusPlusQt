@@ -14,6 +14,7 @@ set(QT_SRCS
     qtobjectfactory.cpp
     qtimagefile.cpp
     qtsoundfile.cpp
+    qtatlasfile.cpp
     qtsoundobjectinforeference.cpp
     qtboneinstanceinfo.cpp
     qtboxinstanceinfo.cpp
@@ -29,6 +30,7 @@ set(QT_HDRS
     qtobjectfactory.h
     qtimagefile.h
     qtsoundfile.h
+    qtatlasfile.h
     qtsoundobjectinforeference.h
     qtboneinstanceinfo.h
     qtboxinstanceinfo.h
