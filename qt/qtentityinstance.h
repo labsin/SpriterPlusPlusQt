@@ -25,6 +25,7 @@ class QtEntityInstance : public QQuickItem
 	Q_PROPERTY(QString animation READ animation WRITE setAnimation NOTIFY animationChanged)
 	Q_PROPERTY(QPointF scale READ scale WRITE setScale NOTIFY scaleChanged)
 	Q_PROPERTY(float speedRatio READ speedRatio WRITE setSpeedRatio NOTIFY speedRatioChanged)
+	Q_PROPERTY(QString error READ errorString NOTIFY errorStringChanged)
 
 public:
 	QtEntityInstance(QQuickItem *parent = 0);
@@ -55,6 +56,11 @@ public:
 		return m_speedRatio;
 	}
 
+	QString errorString() const
+	{
+		return m_errorString;
+	}
+
 signals:
 	void nameChanged(QString name);
 
@@ -69,6 +75,8 @@ signals:
 	void looped();
 
 	void finished();
+
+	void errorStringChanged(QString error);
 
 public slots:
 	void setName(QString name);
@@ -91,6 +99,8 @@ public slots:
 private:
 	void load();
 	void unload();
+
+	void setErrorString(QString error);
 
 	QSGSpriterBase *getQSGSpriterNode(SpriterEngine::UniversalObjectInterface* interface);
 
@@ -115,6 +125,8 @@ private:
 	QTime m_time;
 
 	QMutex m_nodeMapMutex;
+
+	QString m_errorString;
 
 protected:
 	QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *) override;

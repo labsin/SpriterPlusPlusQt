@@ -24,7 +24,6 @@
 QtEntityInstance::QtEntityInstance(QQuickItem *parent):
 	QQuickItem(parent),
 	m_zOrderChanged(false),
-	m_currentEntity(false),
 	m_model(nullptr),
 	m_currentEntity(nullptr),
 	m_zOrder(nullptr),
@@ -38,12 +37,12 @@ QtEntityInstance::QtEntityInstance(QQuickItem *parent):
 
 QtEntityInstance::~QtEntityInstance()
 {
-	for(QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterBase*>::iterator it = m_entityMap.begin(), end = m_entityMap.end(); it != end; it++) {
+	for(auto it = m_entityMap.begin(), end = m_entityMap.end(); it != end; it++) {
 		delete it.value();
 	}
 
 	QMutexLocker locker(&m_nodeMapMutex);
-	for(QHash<SpriterEngine::UniversalObjectInterface*, QSGSpriterBase*>::iterator it = m_nodeMap.begin(), end = m_nodeMap.end(); it != end; it++) {
+	for(auto it = m_nodeMap.begin(), end = m_nodeMap.end(); it != end; it++) {
 		delete it.value();
 	}
 }
@@ -137,6 +136,11 @@ void QtEntityInstance::load()
 	m_currentEntity = m_entityMap.value(m_name);
 	if(!m_currentEntity) {
 		m_currentEntity = m_model->getNewEntityInstance(m_name);
+		if(!m_currentEntity) {
+			setErrorString("Entity "+m_name+" not found.");
+			unload();
+			return;
+		}
 		m_entityMap.insert(m_name, m_currentEntity);
 	}
 	if(!m_animation.isEmpty()) {
@@ -150,8 +154,18 @@ void QtEntityInstance::load()
 
 void QtEntityInstance::unload()
 {
-	m_currentEntity->pausePlayback();
+	if(m_currentEntity)
+		m_currentEntity->pausePlayback();
 	m_currentEntity = nullptr;
+}
+
+void QtEntityInstance::setErrorString(QString error)
+{
+	if (m_errorString == error)
+		return;
+
+	m_errorString = error;
+	emit errorStringChanged(error);
 }
 
 QSGSpriterBase *QtEntityInstance::getQSGSpriterNode(SpriterEngine::UniversalObjectInterface *interface)
@@ -200,6 +214,9 @@ void QtEntityInstance::updateInterface()
 
 void QtEntityInstance::startResume()
 {
+	if(!m_currentEntity)
+		return;
+
 	if(m_animation.isEmpty())
 		return;
 
@@ -208,6 +225,9 @@ void QtEntityInstance::startResume()
 
 void QtEntityInstance::pause()
 {
+	if(!m_currentEntity)
+		return;
+
 	if(m_animation.isEmpty())
 		return;
 
