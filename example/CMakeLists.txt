@@ -11,6 +11,9 @@ add_definitions(-DQT_QML_DEBUG)
 file(COPY ${SPRITER_PLUS_PLUS_SOURCE_DIR}/Release/GreyGuy
     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/GreyGuyAtlas
+    DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
 INCLUDE_DIRECTORIES(${QT_SPRITER_SOURCE_DIR})
 
 set(EXAMPLE_SRCS
@@ -18,6 +21,10 @@ set(EXAMPLE_SRCS
 
 set(QML_SRCS
     main.qml)
+
+file(GLOB_RECURSE GrayGuyFiles ${SPRITER_PLUS_PLUS_SOURCE_DIR}/Release/GreyGuy/*)
+
+qtcreator_add_project_resources(${GrayGuyFiles})
 
 qtcreator_add_project_resources(${QML_SRCS})
 
