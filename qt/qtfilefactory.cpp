@@ -1,5 +1,6 @@
 #include "qtfilefactory.h"
 #include "qtxmlspriterfiledocumentwrapper.h"
+#include "qtjsonspriterfiledocumentwrapper.h"
 #include "qtimagefile.h"
 #include "qtsoundfile.h"
 
@@ -23,4 +24,9 @@ SoundFile *QtFileFactory::newSoundFile(const std::string &initialFilePath)
 SpriterFileDocumentWrapper *QtFileFactory::newScmlDocumentWrapper()
 {
 	return new QtXmlSpriterFileDocumentWrapper();
+}
+
+SpriterFileDocumentWrapper *QtFileFactory::newSconDocumentWrapper()
+{
+	return new QtJSONSpriterFileDocumentWrapper();
 }
