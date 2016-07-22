@@ -1,4 +1,4 @@
-#include "qtspriterfileattributewrapper.h"
+#include "qtxmlspriterfileattributewrapper.h"
 #include "global/settings.h"
 
 using namespace SpriterEngine;

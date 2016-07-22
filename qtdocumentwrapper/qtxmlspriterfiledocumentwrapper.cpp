@@ -1,6 +1,6 @@
-#include "qtspriterfiledocumentwrapper.h"
+#include "qtxmlspriterfiledocumentwrapper.h"
 
-#include "qtspriterfileelementwrapper.h"
+#include "qtxmlspriterfileelementwrapper.h"
 #include <QFile>
 #include <QString>
 #include <QDomElement>

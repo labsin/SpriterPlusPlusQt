@@ -1,6 +1,6 @@
-#include "qtspriterfileelementwrapper.h"
+#include "qtxmlspriterfileelementwrapper.h"
 
-#include "qtspriterfileattributewrapper.h"
+#include "qtxmlspriterfileattributewrapper.h"
 #include <QDomNamedNodeMap>
 #include <QString>
 
