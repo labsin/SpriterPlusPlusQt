@@ -15,7 +15,7 @@ namespace SpriterEngine
 class QtImageFile : public ImageFile
 {
 public:
-	QtImageFile(std::string initialFilePath, point initialDefaultPivot);
+	QtImageFile(std::string initialFilePath, point initialDefaultPivot, atlasdata atlasData);
 	~QtImageFile();
 
 	void renderSprite(UniversalObjectInterface *spriteInfo) override;

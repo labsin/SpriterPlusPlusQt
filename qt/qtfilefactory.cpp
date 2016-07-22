@@ -10,9 +10,9 @@ QtFileFactory::QtFileFactory()
 
 }
 
-ImageFile *QtFileFactory::newImageFile(const std::string &initialFilePath, point initialDefaultPivot)
+ImageFile *QtFileFactory::newImageFile(const std::string &initialFilePath, point initialDefaultPivot, atlasdata atlasData)
 {
-	return new QtImageFile(initialFilePath, initialDefaultPivot);
+	return new QtImageFile(initialFilePath, initialDefaultPivot, atlasData);
 }
 
 SoundFile *QtFileFactory::newSoundFile(const std::string &initialFilePath)

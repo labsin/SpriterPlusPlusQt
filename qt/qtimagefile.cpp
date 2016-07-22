@@ -6,8 +6,8 @@
 
 using namespace SpriterEngine;
 
-QtImageFile::QtImageFile(std::string initialFilePath, point initialDefaultPivot):
 	ImageFile(initialFilePath,initialDefaultPivot), m_width(0), m_height(0)
+QtImageFile::QtImageFile(std::string initialFilePath, point initialDefaultPivot, atlasdata atlasData):
 {
 	initializeFile();
 }
