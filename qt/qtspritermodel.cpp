@@ -29,7 +29,9 @@ void QtSpriterModel::error(const std::string &errorMessage)
 
 SpriterEngine::EntityInstance* QtSpriterModel::getNewEntityInstance(QString name)
 {
-	Q_ASSERT(m_model);
+	if(!m_model) {
+		return nullptr;
+	}
 	return m_model->getNewEntityInstance(name.toStdString());
 }
 
@@ -81,7 +83,7 @@ void QtSpriterModel::setDebug(bool debug)
 
 void QtSpriterModel::setRenderBones(bool renderBones)
 {
-	if (this->renderBones() == renderBones)
+	if (SpriterEngine::Settings::renderDebugBones == renderBones)
 		return;
 
 	SpriterEngine::Settings::renderDebugBones = renderBones;
@@ -90,7 +92,7 @@ void QtSpriterModel::setRenderBones(bool renderBones)
 
 void QtSpriterModel::setRenderPoints(bool renderPoints)
 {
-	if (this->renderPoints() == renderPoints)
+	if (SpriterEngine::Settings::renderDebugPoints == renderPoints)
 		return;
 
 	SpriterEngine::Settings::renderDebugPoints = renderPoints;
@@ -99,7 +101,7 @@ void QtSpriterModel::setRenderPoints(bool renderPoints)
 
 void QtSpriterModel::setRenderBoxes(bool renderBoxes)
 {
-	if (this->renderBoxes() == renderBoxes)
+	if (SpriterEngine::Settings::renderDebugBoxes == renderBoxes)
 		return;
 
 	SpriterEngine::Settings::renderDebugBoxes = renderBoxes;

@@ -196,9 +196,8 @@ void QtEntityInstance::updateInterface()
 
 	ObjectInterfaceVector* zOrder = m_currentEntity->getZOrder();
 
+	// std::vector compares sequencially
 	if(zOrder == m_zOrder) {
-		// SpriterPlusPlus builds a new vector on a zOrder change
-		// That's why we can do the compare
 		return;
 	}
 
