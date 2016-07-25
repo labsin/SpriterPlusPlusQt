@@ -25,7 +25,9 @@ QtEntityInstanceWorker::QtEntityInstanceWorker(QtSpriterModel *model) :
 	m_currentEntity(nullptr), m_zOrder(nullptr)
 {
 	m_modelWorker = model->m_worker;
+	if(QtSpriterModel::threaded) {
 		this->moveToThread(&model->m_workerThread);
+	}
 }
 
 QtEntityInstanceWorker::~QtEntityInstanceWorker()

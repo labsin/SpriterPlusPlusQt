@@ -54,6 +54,8 @@ public:
 	explicit QtSpriterModel(QObject *parent = 0);
 	~QtSpriterModel();
 
+	static bool threaded;
+
 	static void error(const std::string &errorMessage);
 
 	QString file() const

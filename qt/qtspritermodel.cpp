@@ -72,19 +72,27 @@ QtSpriterModel::QtSpriterModel(QObject *parent):
 	QObject(parent), m_loaded(false)
 {
 	m_worker = new QtSpriterModelWorker();
-	m_worker->moveToThread(&m_workerThread);
-	connect(&m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
+	if(QtSpriterModel::threaded) {
+		m_worker->moveToThread(&m_workerThread);
+		connect(&m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
+	}
 	connect(this, &QtSpriterModel::fileChanged, m_worker, &QtSpriterModelWorker::load);
 	connect(m_worker, &QtSpriterModelWorker::newEntityInstance, this, &QtSpriterModel::newEntityInstance);
 	connect(m_worker, &QtSpriterModelWorker::loaded, this, &QtSpriterModel::setLoaded);
-	m_workerThread.start();
+	if(QtSpriterModel::threaded) {
+		m_workerThread.start();
+	}
 }
 
 QtSpriterModel::~QtSpriterModel()
 {
-	m_workerThread.quit();
-	m_workerThread.wait();
+	if(QtSpriterModel::threaded) {
+		m_workerThread.quit();
+		m_workerThread.wait();
+	}
 }
+
+bool QtSpriterModel::threaded = true;
 
 void QtSpriterModel::error(const std::string &errorMessage)
 {
