@@ -179,6 +179,7 @@ void QtEntityInstance::load()
 	else {
 		m_model->getNewEntityInstance(m_name, this);
 	}
+	emit loadedChanged(m_currentEntity);
 }
 
 void QtEntityInstance::unload()

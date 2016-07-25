@@ -26,6 +26,7 @@ class QtEntityInstance : public QQuickItem
 	Q_PROPERTY(QPointF scale READ scale WRITE setScale NOTIFY scaleChanged)
 	Q_PROPERTY(float speedRatio READ speedRatio WRITE setSpeedRatio NOTIFY speedRatioChanged)
 	Q_PROPERTY(QString error READ errorString NOTIFY errorStringChanged)
+	Q_PROPERTY(bool loaded READ loaded NOTIFY loadedChanged)
 
 public:
 	QtEntityInstance(QQuickItem *parent = 0);
@@ -61,6 +62,11 @@ public:
 		return m_errorString;
 	}
 
+	bool loaded() const
+	{
+		return m_currentEntity;
+	}
+
 signals:
 	void nameChanged(QString name);
 
@@ -77,6 +83,8 @@ signals:
 	void finished();
 
 	void errorStringChanged(QString error);
+
+	void loadedChanged(bool loaded);
 
 public slots:
 	void setName(QString name);
