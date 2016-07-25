@@ -212,6 +212,7 @@ private:
 	QString m_errorString;
 
 	bool m_loaded;
+	bool m_loading;
 
 	bool m_running;
 

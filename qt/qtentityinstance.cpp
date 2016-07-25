@@ -153,6 +153,7 @@ QtEntityInstance::QtEntityInstance(QQuickItem *parent):
 	m_zOrder(nullptr),
 	m_zOrderChanged(false),
 	m_loaded(false),
+	m_loading(false),
 	m_running(false)
 {
 	setFlag(ItemHasContents);
@@ -172,12 +173,15 @@ void QtEntityInstance::setName(QString name)
 	if (data.entityName == name)
 		return;
 
-	if(!data.entityName.isEmpty()) {
+	if(m_loaded || m_loading) {
 		unload();
 	}
 
 	data.entityName = name;
-	workerLoad(data);
+	if(m_model) {
+		emit workerLoad(data);
+		m_loading = true;
+	}
 	emit nameChanged(name);
 }
 
@@ -211,6 +215,7 @@ void QtEntityInstance::setModel(QtSpriterModel *model)
 
 
 		if(!data.entityName.isEmpty()) {
+			m_loading = true;
 			workerLoad(data);
 		}
 	}
@@ -231,7 +236,7 @@ void QtEntityInstance::setAnimation(QString animation)
 		return;
 
 	data.animationName = animation;
-	if(m_loaded) {
+	if(m_loaded || m_loading) {
 		emit workerSetCurrentAnimation(animation);
 	}
 	emit animationChanged(animation);
@@ -243,7 +248,7 @@ void QtEntityInstance::setScale(QPointF scale)
 		return;
 
 	data.scale = scale;
-	if(m_loaded) {
+	if(m_loaded || m_loading) {
 		emit workerSetScale(scale);
 	}
 	emit scaleChanged(scale);
@@ -255,8 +260,8 @@ void QtEntityInstance::setSpeedRatio(float speedRatio)
 		return;
 
 	data.playbackSpeed = speedRatio;
-	if(m_loaded) {
-		emit workerSetPlaybackSpeedRatio(data.playbackSpeed);
+	if(m_loaded || m_loading) {
+		emit workerSetPlaybackSpeedRatio(speedRatio);
 	}
 	emit speedRatioChanged(speedRatio);
 }
@@ -276,6 +281,7 @@ void QtEntityInstance::setLoaded(bool loaded) {
 	}
 
 	m_loaded = loaded;
+	m_loading = false;
 	emit loadedChanged(loaded);
 }
 
