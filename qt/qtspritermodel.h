@@ -10,9 +10,35 @@ class SpriterModel;
 class EntityInstance;
 }
 
-class QtSpriterModelWorker;
-
 class QtEntityInstance;
+
+class QtEntityInstanceWorker;
+
+class QtSpriterModelWorker : public QObject
+{
+	Q_OBJECT
+public:
+	QtSpriterModelWorker();
+	~QtSpriterModelWorker();
+
+	bool isLoaded();
+	SpriterEngine::EntityInstance* getNewEntityInstance(QString name);
+
+signals:
+	void loaded();
+	void newEntityInstance(QString name, QtEntityInstance* instance, SpriterEngine::EntityInstance *entity);
+
+public slots:
+	void load(QString fileName);
+	void getNewEntityInstance(QString name, QtEntityInstance* instance);
+
+private:
+	void setLoaded(bool isLoaded);
+
+	SpriterEngine::SpriterModel *m_model;
+	bool m_loaded;
+	QMutex m_loadedMutex;
+};
 
 class QtSpriterModel : public QObject
 {
@@ -91,8 +117,12 @@ private:
 	QString m_file;
 
 	bool m_debug;
+	QtSpriterModelWorker* m_worker;
 	QThread m_workerThread;
 	bool m_loaded;
+
+	friend class QtEntityInstanceWorker;
+	friend class QtEntityInstance;
 };
 
 #endif // QSPRINTERMODEL_H

@@ -14,6 +14,7 @@ public:
 	void registerTypes(const char *uri)
 	{
 		Q_ASSERT(uri == QLatin1String("Spriter"));
+		qRegisterMetaType<QtEntityInstanceData>();
 		qmlRegisterType<QtSpriterModel>(uri, 0, 1, "SpriterModel");
 		qmlRegisterType<QtEntityInstance>(uri, 0, 1, "EntityInstance");
 	}

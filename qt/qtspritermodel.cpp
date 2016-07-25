@@ -11,31 +11,6 @@
 #include <QDebug>
 #include <QTimerEvent>
 
-class QtSpriterModelWorker : public QObject
-{
-	Q_OBJECT
-public:
-	QtSpriterModelWorker();
-	~QtSpriterModelWorker();
-
-	bool isLoaded();
-
-signals:
-	void loaded();
-	void newEntityInstance(QString name, QtEntityInstance* instance, SpriterEngine::EntityInstance *entity);
-
-public slots:
-	void load(QString fileName);
-	void getNewEntityInstance(QString name, QtEntityInstance* instance);
-
-private:
-	void setLoaded(bool isLoaded);
-
-	SpriterEngine::SpriterModel *m_model;
-	bool m_loaded;
-	QMutex m_loadedMutex;
-};
-
 QtSpriterModelWorker::QtSpriterModelWorker():
 	m_model(nullptr), m_loaded(false)
 {
@@ -66,6 +41,14 @@ bool QtSpriterModelWorker::isLoaded()
 	return m_loaded;
 }
 
+SpriterEngine::EntityInstance *QtSpriterModelWorker::getNewEntityInstance(QString name)
+{
+	if(m_model) {
+		return m_model->getNewEntityInstance(name.toStdString());
+	}
+	return nullptr;
+}
+
 void QtSpriterModelWorker::load(QString fileName)
 {
 	if(m_model) {
@@ -88,13 +71,12 @@ void QtSpriterModelWorker::setLoaded(bool isLoaded)
 QtSpriterModel::QtSpriterModel(QObject *parent):
 	QObject(parent), m_loaded(false)
 {
-	QtSpriterModelWorker *worker = new QtSpriterModelWorker();
-	worker->moveToThread(&m_workerThread);
-	connect(&m_workerThread, &QThread::finished, worker, &QObject::deleteLater);
-	connect(this, &QtSpriterModel::fileChanged, worker, &QtSpriterModelWorker::load);
-	connect(this, &QtSpriterModel::getNewEntityInstance, worker, &QtSpriterModelWorker::getNewEntityInstance);
-	connect(worker, &QtSpriterModelWorker::newEntityInstance, this, &QtSpriterModel::newEntityInstance);
-	connect(worker, &QtSpriterModelWorker::loaded, this, &QtSpriterModel::setLoaded);
+	m_worker = new QtSpriterModelWorker();
+	m_worker->moveToThread(&m_workerThread);
+	connect(&m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
+	connect(this, &QtSpriterModel::fileChanged, m_worker, &QtSpriterModelWorker::load);
+	connect(m_worker, &QtSpriterModelWorker::newEntityInstance, this, &QtSpriterModel::newEntityInstance);
+	connect(m_worker, &QtSpriterModelWorker::loaded, this, &QtSpriterModel::setLoaded);
 	m_workerThread.start();
 }
 
@@ -181,5 +163,3 @@ void QtSpriterModel::newEntityInstance(QString name, QtEntityInstance *instance,
 {
 	instance->setNewEntityInstance(name, entity);
 }
-
-#include "qtspritermodel.moc"
