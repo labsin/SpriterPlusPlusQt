@@ -19,14 +19,16 @@ class QSGSpriterBase;
 
 struct QtEntityInstanceData {
 	QtEntityInstanceData(QString _entityName = QString(""), QString _animationName = QString(""),
-						 QPointF _scale = QPointF(1.0, 1.0), float _playbackSpeed = 1.0) :
-		entityName(_entityName), animationName(_animationName), scale(_scale), playbackSpeed(_playbackSpeed)
+						 QPointF _scale = QPointF(1.0, 1.0), float _playbackSpeed = 1.0, float _blendTime = 0.0) :
+		entityName(_entityName), animationName(_animationName), scale(_scale), playbackSpeed(_playbackSpeed),
+		blendTime(_blendTime)
 	{
 	}
 	QString entityName;
 	QString animationName;
 	QPointF scale;
 	float playbackSpeed;
+	float blendTime;
 };
 
 class QtEntityInstanceWorker : public QObject {
@@ -43,6 +45,7 @@ public slots:
 	void setCurrentAnimation(const QString animation);
 	void setScale(const QPointF scale);
 	void setPlaybackSpeedRatio(float speed);
+	void setBlendTime(float blendTime);
 
 	void load(QtEntityInstanceData data);
 
@@ -59,6 +62,7 @@ signals:
 
 private:
 	void unload();
+	void setRunning(bool running);
 
 	SpriterEngine::EntityInstance* m_currentEntity;
 	QHash<QString, SpriterEngine::EntityInstance*> m_entityMap;
@@ -68,6 +72,10 @@ private:
 	QtSpriterModelWorker* m_modelWorker;
 
 	QTime m_time;
+
+	float m_blendTime;
+	bool m_running;
+	bool m_firstAnimation;
 };
 
 class QtEntityInstance : public QQuickItem
@@ -81,6 +89,7 @@ class QtEntityInstance : public QQuickItem
 	Q_PROPERTY(QString error READ errorString NOTIFY errorStringChanged)
 	Q_PROPERTY(bool loaded READ loaded NOTIFY loadedChanged)
 	Q_PROPERTY(bool running READ running NOTIFY runningChanged)
+	Q_PROPERTY(float blendTime READ blendTime WRITE setBlendTime NOTIFY blendTimeChanged)
 
 public:
 	QtEntityInstance(QQuickItem *parent = 0);
@@ -126,6 +135,11 @@ public:
 		return m_running;
 	}
 
+	float blendTime() const
+	{
+		return data.blendTime;
+	}
+
 signals:
 	void nameChanged(QString name);
 
@@ -150,12 +164,15 @@ signals:
 	void workerSetCurrentAnimation(QString animation);
 	void workerSetScale(QPointF scale);
 	void workerSetPlaybackSpeedRatio(float speed);
+	void workerSetBlendTime(float blendTime);
 	void workerLoad(QtEntityInstanceData data);
 	void workerUpdate();
 	void workerDelete();
 
 	void startResume();
 	void pause();
+
+	void blendTimeChanged(float blendTime);
 
 public slots:
 	void setName(QString name);
@@ -169,6 +186,8 @@ public slots:
 	void setScale(QPointF scale);
 
 	void setSpeedRatio(float speedRatio);
+
+	void setBlendTime(float blendTime);
 
 private slots:
 	void updateQQuickWindow(QQuickWindow* window);

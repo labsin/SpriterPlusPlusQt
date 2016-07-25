@@ -22,7 +22,7 @@
 #include <math.h>
 
 QtEntityInstanceWorker::QtEntityInstanceWorker(QtSpriterModel *model) :
-	m_currentEntity(nullptr), m_zOrder(nullptr)
+	m_currentEntity(nullptr), m_zOrder(nullptr), m_running(false), m_firstAnimation(true)
 {
 	m_modelWorker = model->m_worker;
 	if(QtSpriterModel::threaded) {
@@ -41,7 +41,7 @@ void QtEntityInstanceWorker::startResume()
 {
 	if(m_currentEntity) {
 		m_currentEntity->startResumePlayback();
-		emit running(true);
+		setRunning(true);
 	}
 }
 
@@ -49,14 +49,24 @@ void QtEntityInstanceWorker::pause()
 {
 	if(m_currentEntity) {
 		m_currentEntity->pausePlayback();
-		emit running(false);
+		setRunning(false);
 	}
 }
 
 void QtEntityInstanceWorker::setCurrentAnimation(const QString animation)
 {
-	if(m_currentEntity) {
-		m_currentEntity->setCurrentAnimation(animation.toStdString());
+	if(m_currentEntity && !animation.isEmpty()) {
+		if(m_blendTime > 0.0 && !m_firstAnimation) {
+			m_currentEntity->setCurrentAnimation(animation.toStdString(), m_blendTime);
+			m_currentEntity->blend(0.0, 0.0);
+		}
+		else {
+			m_currentEntity->setCurrentAnimation(animation.toStdString());
+			m_currentEntity->setCurrentTimeToKeyAtIndex(0);
+		}
+		//TODO: sure?
+		setRunning(true);
+		m_firstAnimation = false;
 	}
 }
 
@@ -72,6 +82,11 @@ void QtEntityInstanceWorker::setPlaybackSpeedRatio(float speed)
 	if(m_currentEntity) {
 		m_currentEntity->setPlaybackSpeedRatio(speed);
 	}
+}
+
+void QtEntityInstanceWorker::setBlendTime(float blendTime)
+{
+	m_blendTime = blendTime;
 }
 
 void QtEntityInstanceWorker::load(QtEntityInstanceData data)
@@ -92,17 +107,16 @@ void QtEntityInstanceWorker::load(QtEntityInstanceData data)
 		entity = m_modelWorker->getNewEntityInstance(data.entityName);
 	}
 	if(entity) {
+		m_blendTime = data.blendTime;
+
 		m_currentEntity = entity;
 
-		if(!data.animationName.isEmpty()) {
-			m_currentEntity->setCurrentAnimation(data.animationName.toStdString());
-		}
 		m_currentEntity->setScale(SpriterEngine::point{data.scale.x(),data.scale.y()});
 		m_currentEntity->setPlaybackSpeedRatio(data.playbackSpeed);
+		setCurrentAnimation(data.animationName);
 
 		m_time.start();
 		emit loaded(true);
-		emit running(true);
 	}
 	else {
 		m_currentEntity = nullptr;
@@ -131,7 +145,7 @@ void QtEntityInstanceWorker::update()
 
 	if(m_currentEntity->animationJustFinished()) {
 		emit finished();
-		emit running(false);
+		setRunning(false);
 	}
 	if(m_currentEntity->animationJustLooped()) {
 		emit looped();
@@ -144,7 +158,17 @@ void QtEntityInstanceWorker::unload()
 {
 	m_currentEntity = nullptr;
 	emit loaded(false);
-	emit running(false);
+	setRunning(false);
+}
+
+void QtEntityInstanceWorker::setRunning(bool running)
+{
+	if(m_running == running) {
+		return;
+	}
+
+	m_running = running;
+	emit QtEntityInstanceWorker::running(running);
 }
 
 QtEntityInstance::QtEntityInstance(QQuickItem *parent):
@@ -203,6 +227,7 @@ void QtEntityInstance::setModel(QtSpriterModel *model)
 		connect(this, &QtEntityInstance::workerSetScale, worker, &QtEntityInstanceWorker::setScale);
 		connect(this, &QtEntityInstance::workerUpdate, worker, &QtEntityInstanceWorker::update);
 		connect(this, &QtEntityInstance::workerDelete, worker, &QtEntityInstanceWorker::deleteLater);
+		connect(this, &QtEntityInstance::workerSetBlendTime, worker, &QtEntityInstanceWorker::setBlendTime);
 		connect(this, &QtEntityInstance::destroyed, worker, &QtEntityInstanceWorker::deleteLater);
 		connect(this, &QtEntityInstance::pause, worker, &QtEntityInstanceWorker::pause);
 		connect(this, &QtEntityInstance::startResume, worker, &QtEntityInstanceWorker::startResume);
@@ -264,6 +289,18 @@ void QtEntityInstance::setSpeedRatio(float speedRatio)
 		emit workerSetPlaybackSpeedRatio(speedRatio);
 	}
 	emit speedRatioChanged(speedRatio);
+}
+
+void QtEntityInstance::setBlendTime(float blendTime)
+{
+	if (data.blendTime == blendTime)
+		return;
+
+	data.blendTime = blendTime;
+	if(m_loaded || m_loading) {
+		emit workerSetBlendTime(blendTime);
+	}
+	emit blendTimeChanged(blendTime);
 }
 
 void QtEntityInstance::setErrorString(QString error)
