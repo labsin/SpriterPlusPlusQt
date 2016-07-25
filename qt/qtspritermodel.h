@@ -122,7 +122,6 @@ private:
 	bool m_loaded;
 
 	friend class QtEntityInstanceWorker;
-	friend class QtEntityInstance;
 };
 
 #endif // QSPRINTERMODEL_H

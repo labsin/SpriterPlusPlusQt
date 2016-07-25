@@ -25,6 +25,7 @@ QtEntityInstanceWorker::QtEntityInstanceWorker(QtSpriterModel *model) :
 	m_currentEntity(nullptr), m_zOrder(nullptr)
 {
 	m_modelWorker = model->m_worker;
+		this->moveToThread(&model->m_workerThread);
 }
 
 QtEntityInstanceWorker::~QtEntityInstanceWorker()
@@ -196,6 +197,7 @@ void QtEntityInstance::setModel(QtSpriterModel *model)
 		connect(this, &QtEntityInstance::workerSetScale, worker, &QtEntityInstanceWorker::setScale);
 		connect(this, &QtEntityInstance::workerUpdate, worker, &QtEntityInstanceWorker::update);
 		connect(this, &QtEntityInstance::workerDelete, worker, &QtEntityInstanceWorker::deleteLater);
+		connect(this, &QtEntityInstance::destroyed, worker, &QtEntityInstanceWorker::deleteLater);
 		connect(this, &QtEntityInstance::pause, worker, &QtEntityInstanceWorker::pause);
 		connect(this, &QtEntityInstance::startResume, worker, &QtEntityInstanceWorker::startResume);
 		connect(worker, &QtEntityInstanceWorker::error, this, &QtEntityInstance::setErrorString);
@@ -205,7 +207,6 @@ void QtEntityInstance::setModel(QtSpriterModel *model)
 		connect(worker, &QtEntityInstanceWorker::updated, this, &QtEntityInstance::setZOrder);
 		connect(worker, &QtEntityInstanceWorker::running, this, &QtEntityInstance::setRunning);
 
-		worker->moveToThread(&m_model->m_workerThread);
 
 		if(!data.entityName.isEmpty()) {
 			workerLoad(data);
