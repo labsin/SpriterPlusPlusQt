@@ -31,7 +31,7 @@ QtEntityInstance::QtEntityInstance(QQuickItem *parent):
 	m_speedRatio(1.0)
 {
 	setFlag(ItemHasContents);
-	connect(this,SIGNAL(windowChanged(QQuickWindow*)),this,SLOT(updateQQuickWindow(QQuickWindow*)));
+	connect(this, &QtEntityInstance::windowChanged, this, &QtEntityInstance::updateQQuickWindow);
 	updateQQuickWindow(window());
 }
 
@@ -74,12 +74,13 @@ void QtEntityInstance::setNewEntityInstance(QString name, SpriterEngine::EntityI
 		}
 	}
 }
+
 void QtEntityInstance::setName(QString name)
 {
 	if (m_name == name)
 		return;
 
-	if(!m_name.isNull()) {
+	if(!m_name.isEmpty()) {
 		unload();
 	}
 
@@ -105,17 +106,17 @@ void QtEntityInstance::setModel(QtSpriterModel *model)
 void QtEntityInstance::updateQQuickWindow(QQuickWindow *window)
 {
 	if(window) {
-		connect(window,SIGNAL(frameSwapped()),this,SLOT(updateIfLoaded()));
-		updateIfLoaded();
+		connect(window, &QQuickWindow::frameSwapped, this, &QtEntityInstance::update);
+		update();
 	}
 }
 
-void QtEntityInstance::updateIfLoaded()
+void QtEntityInstance::update()
 {
 	if(!m_currentEntity)
 		return;
 	updateInterface();
-	update();
+	QQuickItem::update();
 }
 
 void QtEntityInstance::setAnimation(QString animation)
@@ -173,6 +174,7 @@ void QtEntityInstance::load()
 		m_currentEntity->setPlaybackSpeedRatio(m_speedRatio);
 
 		m_time.start();
+		update();
 	}
 	else {
 		m_model->getNewEntityInstance(m_name, this);

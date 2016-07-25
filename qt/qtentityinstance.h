@@ -85,22 +85,23 @@ public slots:
 
 	void setNewEntityInstance(QString name, SpriterEngine::EntityInstance* entity);
 
-	void updateQQuickWindow(QQuickWindow* window);
-	void updateIfLoaded();
-
 	void setAnimation(QString animation);
 
 	void setScale(QPointF scale);
 
 	void setSpeedRatio(float speedRatio);
-	void updateInterface();
 
 	void startResume();
 	void pause();
 
+private slots:
+	void updateQQuickWindow(QQuickWindow* window);
+	void update();
+
 private:
 	void load();
 	void unload();
+	void updateInterface();
 
 	void setErrorString(QString error);
 
