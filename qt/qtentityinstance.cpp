@@ -47,6 +47,33 @@ QtEntityInstance::~QtEntityInstance()
 	}
 }
 
+void QtEntityInstance::setNewEntityInstance(QString name, SpriterEngine::EntityInstance *entity)
+{
+	if(!entity) {
+		setErrorString("Entity "+name+" not found.");
+		unload();
+		return;
+	}
+	SpriterEngine::EntityInstance *previous_instance = nullptr;
+	if(m_entityMap.contains(name)) {
+		previous_instance = m_entityMap.take(name);
+	}
+	m_entityMap.insert(m_name, entity);
+	if(m_name == name) {
+		Q_ASSERT(previous_instance == m_currentEntity);
+
+		if(previous_instance) {
+			delete previous_instance;
+		}
+		m_currentEntity = nullptr;
+		load();
+	}
+	else {
+		if(previous_instance && previous_instance != m_currentEntity) {
+			delete previous_instance;
+		}
+	}
+}
 void QtEntityInstance::setName(QString name)
 {
 	if (m_name == name)
@@ -131,25 +158,25 @@ void QtEntityInstance::setSpeedRatio(float speedRatio)
 void QtEntityInstance::load()
 {
 	Q_ASSERT(m_model);
-	Q_ASSERT(!m_name.isEmpty());
+	if(m_name.isEmpty()) {
+		setErrorString("Entity name set to null.");
+		unload();
+		return;
+	}
 
 	m_currentEntity = m_entityMap.value(m_name);
-	if(!m_currentEntity) {
-		m_currentEntity = m_model->getNewEntityInstance(m_name);
-		if(!m_currentEntity) {
-			setErrorString("Entity "+m_name+" not found.");
-			unload();
-			return;
+	if(m_currentEntity) {
+		if(!m_animation.isEmpty()) {
+			m_currentEntity->setCurrentAnimation(m_animation.toStdString());
 		}
-		m_entityMap.insert(m_name, m_currentEntity);
-	}
-	if(!m_animation.isEmpty()) {
-		m_currentEntity->setCurrentAnimation(m_animation.toStdString());
-	}
-	m_currentEntity->setScale(SpriterEngine::point{m_scale.x(),m_scale.y()});
-	m_currentEntity->setPlaybackSpeedRatio(m_speedRatio);
+		m_currentEntity->setScale(SpriterEngine::point{m_scale.x(),m_scale.y()});
+		m_currentEntity->setPlaybackSpeedRatio(m_speedRatio);
 
-	m_time.start();
+		m_time.start();
+	}
+	else {
+		m_model->getNewEntityInstance(m_name, this);
+	}
 }
 
 void QtEntityInstance::unload()

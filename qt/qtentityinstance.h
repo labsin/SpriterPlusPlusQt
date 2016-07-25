@@ -83,6 +83,8 @@ public slots:
 
 	void setModel(QtSpriterModel* model);
 
+	void setNewEntityInstance(QString name, SpriterEngine::EntityInstance* entity);
+
 	void updateQQuickWindow(QQuickWindow* window);
 	void updateIfLoaded();
 

@@ -4,7 +4,7 @@ import Spriter 0.1
 Rectangle {
     width: 800
     height: 600
-    color: "red"
+    color: modelId.loaded?"red":"grey"
     SpriterModel {
         id: modelId
         file: "GreyGuy/player.scml"
