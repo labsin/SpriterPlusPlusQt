@@ -135,8 +135,6 @@ private:
 
 	QTime m_time;
 
-	QMutex m_nodeMapMutex;
-
 	QString m_errorString;
 
 protected:

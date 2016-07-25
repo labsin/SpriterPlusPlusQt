@@ -41,7 +41,6 @@ QtEntityInstance::~QtEntityInstance()
 		delete it.value();
 	}
 
-	QMutexLocker locker(&m_nodeMapMutex);
 	for(auto it = m_nodeMap.begin(), end = m_nodeMap.end(); it != end; it++) {
 		delete it.value();
 	}
@@ -266,7 +265,6 @@ void QtEntityInstance::pause()
 
 QSGNode *QtEntityInstance::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *)
 {
-	QMutexLocker locker(&m_nodeMapMutex);
 	QSGNode * node = oldNode;
 	if(!m_zOrder || m_zOrder->empty()) {
 		delete oldNode;
