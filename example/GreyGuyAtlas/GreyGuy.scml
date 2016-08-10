@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
     <atlas>
-        <i name="GrayGuy_torso.json"/>
-        <i name="GrayGuy_head.json"/>
-        <i name="GrayGuy_arms.json"/>
-        <i name="GrayGuy_hands.json"/>
-        <i name="GrayGuy_legs.json"/>
-        <i name="GrayGuy_feet.json"/>
+        <i name="GreyGuy_torso.json"/>
+        <i name="GreyGuy_head.json"/>
+        <i name="GreyGuy_arms.json"/>
+        <i name="GreyGuy_hands.json"/>
+        <i name="GreyGuy_legs.json"/>
+        <i name="GreyGuy_feet.json"/>
     </atlas>
     <folder id="0" name="torso" atlas="0">
         <file id="0" name="torso/p_torso_walk.png" width="88" height="88" pivot_x="0.911111" pivot_y="0.555556" ax="0" ay="0" aw="80" ah="57" axoff="4" ayoff="11" arot="false"/>

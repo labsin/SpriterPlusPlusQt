@@ -104,7 +104,7 @@
 	"meta": {
 		"app": "Spriter",
 		"format": "RGBA8888",
-		"image": "GrayGuy_torso.png",
+		"image": "GreyGuy_torso.png",
 		"scale": 1,
 		"size": {
 			"h": 73,

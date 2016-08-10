@@ -184,7 +184,7 @@
 	"meta": {
 		"app": "Spriter",
 		"format": "RGBA8888",
-		"image": "GrayGuy_legs.png",
+		"image": "GreyGuy_legs.png",
 		"scale": 1,
 		"size": {
 			"h": 40,
