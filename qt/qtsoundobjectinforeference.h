@@ -10,7 +10,8 @@ class QtSoundObjectInfoReference : public SoundObjectInfoReference
 public:
         QtSoundObjectInfoReference(QUrl url);
 
-        void playTrigger() override;
+		void playTrigger() override;
+		void setTriggerCount(int newTriggerCount) override;
 
 private:
         void setPlaybackVolume() override;

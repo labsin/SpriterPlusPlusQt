@@ -6,8 +6,8 @@ using namespace SpriterEngine;
 QtSoundObjectInfoReference::QtSoundObjectInfoReference(QUrl url)
 {
 	m_soundEffect.setSource(url);
-	if(m_soundEffect.status()!=QSoundEffect::Ready) {
-			Settings::error("QtSoundFile::initializeFile - QSoundEffect unable to load file from path \"" + url.toString().toStdString() + "\"");
+	if(m_soundEffect.status() != QSoundEffect::Ready) {
+		Settings::error("QtSoundFile::initializeFile - QSoundEffect unable to load file from path \"" + url.toString().toStdString() + "\"");
 	}
 }
 
@@ -16,6 +16,14 @@ void QtSoundObjectInfoReference::playTrigger()
 	if (getTriggerCount())
 	{
 		m_soundEffect.play();
+	}
+}
+
+void QtSoundObjectInfoReference::setTriggerCount(int newTriggerCount)
+{
+	SoundObjectInfoReference::setTriggerCount(newTriggerCount);
+	if(newTriggerCount) {
+		this->playTrigger();
 	}
 }
 
