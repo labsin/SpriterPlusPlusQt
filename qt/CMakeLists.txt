@@ -6,7 +6,7 @@ add_subdirectory(data)
 
 include_directories(${SPRITER_ENGINE_SOURCE_DIR})
 include_directories(${SPRITER_PLUS_PLUS_SOURCE_DIR})
-include_directories(${QT_XML_DOC_SOURCE_DIR})
+include_directories(${QT_DOCUMENT_WRAPPER_SOURCE_DIR})
 
 set(QT_SRCS
     qtspritermodel.cpp
