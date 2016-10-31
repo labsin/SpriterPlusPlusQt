@@ -24,7 +24,7 @@ QSGTexture* QtAtlasFile::getTexture(QQuickWindow* window) {
 		return texture;
 	if(m_image.isNull())
 		return nullptr;
-	texture = window->createTextureFromImage(m_image, QQuickWindow::TextureCanUseAtlas);
+	texture = window->createTextureFromImage(m_image);
 	m_textureMap.insert(window,texture);
 	return texture;
 }
