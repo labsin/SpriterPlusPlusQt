@@ -7,8 +7,8 @@
 class QtXmlSpriterFileAttributeWrapper : public SpriterEngine::SpriterFileAttributeWrapper
 {
 public:
-	QtXmlSpriterFileAttributeWrapper(QDomAttr attribute);
-	QtXmlSpriterFileAttributeWrapper(QDomNamedNodeMap noteMap, int index=0);
+	QtXmlSpriterFileAttributeWrapper(const QDomAttr &attribute);
+	QtXmlSpriterFileAttributeWrapper(const QDomNamedNodeMap &noteMap, int index=0);
 
 	std::string getName() override;
 

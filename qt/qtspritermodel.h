@@ -22,15 +22,15 @@ public:
 	~QtSpriterModelWorker();
 
 	bool isLoaded();
-	SpriterEngine::EntityInstance* getNewEntityInstance(QString name);
+	SpriterEngine::EntityInstance* getNewEntityInstance(const QString &name);
 
 signals:
 	void loaded();
-	void newEntityInstance(QString name, QtEntityInstance* instance, SpriterEngine::EntityInstance *entity);
+	void newEntityInstance(const QString &name, QtEntityInstance* instance, SpriterEngine::EntityInstance *entity);
 
 public slots:
-	void load(QString fileName);
-	void getNewEntityInstance(QString name, QtEntityInstance* instance);
+	void load(const QString &fileName);
+	void getNewEntityInstance(const QString &name, QtEntityInstance* instance);
 
 private:
 	void setLoaded(bool isLoaded);

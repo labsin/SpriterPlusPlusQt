@@ -55,7 +55,7 @@ void QtEntityInstanceWorker::pause()
 	}
 }
 
-void QtEntityInstanceWorker::setCurrentAnimation(const QString animation)
+void QtEntityInstanceWorker::setCurrentAnimation(const QString &animation)
 {
 	if(m_currentEntity && !animation.isEmpty()) {
 		if(m_blendTime > 0.0 && !m_firstAnimation) {
@@ -72,7 +72,7 @@ void QtEntityInstanceWorker::setCurrentAnimation(const QString animation)
 	}
 }
 
-void QtEntityInstanceWorker::setScale(const QPointF scale)
+void QtEntityInstanceWorker::setScale(const QPointF &scale)
 {
 	if(m_currentEntity) {
 		m_currentEntity->setScale(SpriterEngine::point{scale.x(),scale.y()});
@@ -91,7 +91,7 @@ void QtEntityInstanceWorker::setBlendTime(float blendTime)
 	m_blendTime = blendTime;
 }
 
-void QtEntityInstanceWorker::load(QtEntityInstanceData data)
+void QtEntityInstanceWorker::load(const QtEntityInstanceData &data)
 {
 	if(!m_modelWorker) {
 		return;

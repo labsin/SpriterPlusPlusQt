@@ -21,7 +21,7 @@ QtSpriterModelWorker::~QtSpriterModelWorker()
 	delete m_model;
 }
 
-void QtSpriterModelWorker::getNewEntityInstance(QString name, QtEntityInstance* instance)
+void QtSpriterModelWorker::getNewEntityInstance(const QString &name, QtEntityInstance* instance)
 {
 	if(!m_model) {
 		connect(this, &QtSpriterModelWorker::loaded, this, [&]() {
@@ -41,7 +41,7 @@ bool QtSpriterModelWorker::isLoaded()
 	return m_loaded;
 }
 
-SpriterEngine::EntityInstance *QtSpriterModelWorker::getNewEntityInstance(QString name)
+SpriterEngine::EntityInstance *QtSpriterModelWorker::getNewEntityInstance(const QString &name)
 {
 	if(m_model) {
 		return m_model->getNewEntityInstance(name.toStdString());
@@ -49,7 +49,7 @@ SpriterEngine::EntityInstance *QtSpriterModelWorker::getNewEntityInstance(QStrin
 	return nullptr;
 }
 
-void QtSpriterModelWorker::load(QString fileName)
+void QtSpriterModelWorker::load(const QString &fileName)
 {
 	if(m_model) {
 		delete m_model;

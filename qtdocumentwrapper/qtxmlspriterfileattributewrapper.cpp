@@ -3,12 +3,12 @@
 
 using namespace SpriterEngine;
 
-QtXmlSpriterFileAttributeWrapper::QtXmlSpriterFileAttributeWrapper(const QDomAttr attribute):
+QtXmlSpriterFileAttributeWrapper::QtXmlSpriterFileAttributeWrapper(const QDomAttr &attribute):
 	m_attribute(attribute)
 {
 }
 
-QtXmlSpriterFileAttributeWrapper::QtXmlSpriterFileAttributeWrapper(QDomNamedNodeMap noteMap, int index):
+QtXmlSpriterFileAttributeWrapper::QtXmlSpriterFileAttributeWrapper(const QDomNamedNodeMap &noteMap, int index):
 	m_noteMap(noteMap), m_attribute(m_noteMap.item(index).toAttr()), m_index(index)
 {
 }

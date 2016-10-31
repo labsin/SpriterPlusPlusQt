@@ -42,12 +42,12 @@ public slots:
 	void startResume();
 	void pause();
 
-	void setCurrentAnimation(const QString animation);
-	void setScale(const QPointF scale);
+	void setCurrentAnimation(const QString &animation);
+	void setScale(const QPointF &scale);
 	void setPlaybackSpeedRatio(float speed);
 	void setBlendTime(float blendTime);
 
-	void load(QtEntityInstanceData data);
+	void load(const QtEntityInstanceData &data);
 
 	void update();
 
