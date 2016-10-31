@@ -221,27 +221,46 @@ void QtEntityInstance::setModel(QtSpriterModel *model)
 	if(m_model) {
 		QtEntityInstanceWorker* worker = new QtEntityInstanceWorker(m_model);
 
-		connect(this, &QtEntityInstance::workerLoad, worker, &QtEntityInstanceWorker::load);
-		connect(this, &QtEntityInstance::workerSetCurrentAnimation, worker, &QtEntityInstanceWorker::setCurrentAnimation);
-		connect(this, &QtEntityInstance::workerSetPlaybackSpeedRatio, worker, &QtEntityInstanceWorker::setPlaybackSpeedRatio);
-		connect(this, &QtEntityInstance::workerSetScale, worker, &QtEntityInstanceWorker::setScale);
-		connect(this, &QtEntityInstance::workerUpdate, worker, &QtEntityInstanceWorker::update);
-		connect(this, &QtEntityInstance::workerDelete, worker, &QtEntityInstanceWorker::deleteLater);
-		connect(this, &QtEntityInstance::workerSetBlendTime, worker, &QtEntityInstanceWorker::setBlendTime);
-		connect(this, &QtEntityInstance::destroyed, worker, &QtEntityInstanceWorker::deleteLater);
-		connect(this, &QtEntityInstance::pause, worker, &QtEntityInstanceWorker::pause);
-		connect(this, &QtEntityInstance::startResume, worker, &QtEntityInstanceWorker::startResume);
-		connect(worker, &QtEntityInstanceWorker::error, this, &QtEntityInstance::setErrorString);
-		connect(worker, &QtEntityInstanceWorker::looped, this, &QtEntityInstance::looped);
-		connect(worker, &QtEntityInstanceWorker::finished, this, &QtEntityInstance::finished);
-		connect(worker, &QtEntityInstanceWorker::loaded, this, &QtEntityInstance::setLoaded);
-		connect(worker, &QtEntityInstanceWorker::updated, this, &QtEntityInstance::setZOrder);
-		connect(worker, &QtEntityInstanceWorker::running, this, &QtEntityInstance::setRunning);
-
+		if(QtSpriterModel::threaded) {
+			connect(this, &QtEntityInstance::workerLoad, worker, &QtEntityInstanceWorker::load, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::workerSetCurrentAnimation, worker, &QtEntityInstanceWorker::setCurrentAnimation, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::workerSetPlaybackSpeedRatio, worker, &QtEntityInstanceWorker::setPlaybackSpeedRatio, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::workerSetScale, worker, &QtEntityInstanceWorker::setScale, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::workerUpdate, worker, &QtEntityInstanceWorker::update, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::workerDelete, worker, &QtEntityInstanceWorker::deleteLater, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::workerSetBlendTime, worker, &QtEntityInstanceWorker::setBlendTime, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::destroyed, worker, &QtEntityInstanceWorker::deleteLater, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::pause, worker, &QtEntityInstanceWorker::pause, Qt::QueuedConnection);
+			connect(this, &QtEntityInstance::startResume, worker, &QtEntityInstanceWorker::startResume, Qt::QueuedConnection);
+			connect(worker, &QtEntityInstanceWorker::error, this, &QtEntityInstance::setErrorString, Qt::QueuedConnection);
+			connect(worker, &QtEntityInstanceWorker::looped, this, &QtEntityInstance::looped, Qt::QueuedConnection);
+			connect(worker, &QtEntityInstanceWorker::finished, this, &QtEntityInstance::finished, Qt::QueuedConnection);
+			connect(worker, &QtEntityInstanceWorker::loaded, this, &QtEntityInstance::setLoaded, Qt::QueuedConnection);
+			connect(worker, &QtEntityInstanceWorker::updated, this, &QtEntityInstance::setZOrder, Qt::QueuedConnection);
+			connect(worker, &QtEntityInstanceWorker::running, this, &QtEntityInstance::setRunning, Qt::QueuedConnection);
+		}
+		else {
+			connect(this, &QtEntityInstance::workerLoad, worker, &QtEntityInstanceWorker::load, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::workerSetCurrentAnimation, worker, &QtEntityInstanceWorker::setCurrentAnimation, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::workerSetPlaybackSpeedRatio, worker, &QtEntityInstanceWorker::setPlaybackSpeedRatio, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::workerSetScale, worker, &QtEntityInstanceWorker::setScale, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::workerUpdate, worker, &QtEntityInstanceWorker::update, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::workerDelete, worker, &QtEntityInstanceWorker::deleteLater, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::workerSetBlendTime, worker, &QtEntityInstanceWorker::setBlendTime, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::destroyed, worker, &QtEntityInstanceWorker::deleteLater, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::pause, worker, &QtEntityInstanceWorker::pause, Qt::DirectConnection);
+			connect(this, &QtEntityInstance::startResume, worker, &QtEntityInstanceWorker::startResume, Qt::DirectConnection);
+			connect(worker, &QtEntityInstanceWorker::error, this, &QtEntityInstance::setErrorString, Qt::DirectConnection);
+			connect(worker, &QtEntityInstanceWorker::looped, this, &QtEntityInstance::looped, Qt::DirectConnection);
+			connect(worker, &QtEntityInstanceWorker::finished, this, &QtEntityInstance::finished, Qt::DirectConnection);
+			connect(worker, &QtEntityInstanceWorker::loaded, this, &QtEntityInstance::setLoaded, Qt::DirectConnection);
+			connect(worker, &QtEntityInstanceWorker::updated, this, &QtEntityInstance::setZOrder, Qt::DirectConnection);
+			connect(worker, &QtEntityInstanceWorker::running, this, &QtEntityInstance::setRunning, Qt::DirectConnection);
+		}
 
 		if(!data.entityName.isEmpty()) {
 			m_loading = true;
-			workerLoad(data);
+			emit workerLoad(data);
 		}
 	}
 	emit modelChanged(model);

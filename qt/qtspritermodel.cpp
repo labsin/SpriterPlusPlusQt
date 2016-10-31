@@ -74,13 +74,16 @@ QtSpriterModel::QtSpriterModel(QObject *parent):
 	m_worker = new QtSpriterModelWorker();
 	if(QtSpriterModel::threaded) {
 		m_worker->moveToThread(&m_workerThread);
-		connect(&m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
-	}
-	connect(this, &QtSpriterModel::fileChanged, m_worker, &QtSpriterModelWorker::load);
-	connect(m_worker, &QtSpriterModelWorker::newEntityInstance, this, &QtSpriterModel::newEntityInstance);
-	connect(m_worker, &QtSpriterModelWorker::loaded, this, &QtSpriterModel::setLoaded);
-	if(QtSpriterModel::threaded) {
+		connect(&m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater, Qt::QueuedConnection);
+		connect(this, &QtSpriterModel::fileChanged, m_worker, &QtSpriterModelWorker::load, Qt::QueuedConnection);
+		connect(m_worker, &QtSpriterModelWorker::newEntityInstance, this, &QtSpriterModel::newEntityInstance, Qt::QueuedConnection);
+		connect(m_worker, &QtSpriterModelWorker::loaded, this, &QtSpriterModel::setLoaded, Qt::QueuedConnection);
 		m_workerThread.start();
+	}
+	else {
+		connect(this, &QtSpriterModel::fileChanged, m_worker, &QtSpriterModelWorker::load, Qt::DirectConnection);
+		connect(m_worker, &QtSpriterModelWorker::newEntityInstance, this, &QtSpriterModel::newEntityInstance, Qt::DirectConnection);
+		connect(m_worker, &QtSpriterModelWorker::loaded, this, &QtSpriterModel::setLoaded, Qt::DirectConnection);
 	}
 }
 

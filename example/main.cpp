@@ -6,6 +6,10 @@
 #include "qtentityinstance.h"
 #endif
 
+#include "qtspritermodel.h"
+
+bool QtSpriterModel::threaded = true;
+
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
