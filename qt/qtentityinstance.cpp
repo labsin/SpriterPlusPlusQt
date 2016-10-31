@@ -2,9 +2,11 @@
 
 #include "qtimagefile.h"
 #include "qtboneinstanceinfo.h"
+#include "qtpointinstanceinfo.h"
 #include "qsgspriterbase.h"
 #include "qsgspriterobjectnode.h"
 #include "qsgspriterbonenode.h"
+#include "qsgspriterpointnode.h"
 
 #include <entity/entityinstance.h>
 #include <objectinfo/universalobjectinterface.h>
@@ -358,6 +360,9 @@ QSGSpriterBase *QtEntityInstance::getQSGSpriterNode(SpriterEngine::UniversalObje
 		}
 		else if(dynamic_cast<SpriterEngine::QtBoneInstanceInfo*>(interface)) {
 			node = new QSGSpriterBoneNode(interface);
+		}
+		else if(dynamic_cast<SpriterEngine::QtPointInstanceInfo*>(interface)) {
+			node = new QSGSpriterPointNode(interface);
 		}
 		else {
 			node = new QSGSpriterBase(interface);

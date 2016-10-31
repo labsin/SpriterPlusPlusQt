@@ -22,7 +22,8 @@ set(QT_SRCS
     qtentityinstance.cpp
     qsgspriterbase.cpp
     qsgspriterobjectnode.cpp
-    qsgspriterbonenode.cpp)
+    qsgspriterbonenode.cpp
+    qsgspriterpointnode.cpp)
 
 set(QT_HDRS
     qtspritermodel.h
@@ -38,7 +39,8 @@ set(QT_HDRS
     qtentityinstance.h
     qsgspriterbase.h
     qsgspriterobjectnode.h
-    qsgspriterbonenode.h)
+    qsgspriterbonenode.h
+    qsgspriterpointnode.h)
 
 set(QT_PLUGIN_SRCS
     spriterplugin.cpp)
